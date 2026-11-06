@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EditJudge-Bench</title>
+<meta name="description" content="EditJudge-Bench: Auditing VLM Image-Edit Judges with Synthetic Ground Truth. NeurIPS 2026, Evaluations & Datasets Track.">
+<meta property="og:title" content="EditJudge-Bench: Auditing VLM Image-Edit Judges with Synthetic Ground Truth">
+<meta property="og:description" content="A diagnostic benchmark of 1,382 synthetic before/after image pairs with exact ground truth for auditing VLM image-edit judges.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #15294b;
+    --ink: #1b1f27;
+    --muted: #5a6170;
+    --teal: #1f6e64;
+    --mint: #3cc6a0;
+    --mint-soft: rgba(60, 198, 160, 0.15);
+    --line: #e2e1da;
+    --sand: #f6f5f0;
+    --code-fg: #e6ecf5;
+    --serif: "Newsreader", Georgia, serif;
+    --sans: "Inter", system-ui, -apple-system, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+  body { margin: 0; background: #fff; color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  .wrap { max-width: 1088px; margin: 0 auto; padding: 0 24px; }
+
+  /* Nav */
+  .nav { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 18px 48px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .brand img { width: 34px; height: 34px; display: block; }
+  .brand span { font-family: var(--serif); font-weight: 600; font-size: 20px; color: var(--navy); }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { font-weight: 500; font-size: 15px; text-decoration: none; }
+  .nav-links a:hover { color: var(--teal); }
+
+  /* Hero */
+  .hero { text-align: center; padding: 88px 0 56px; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+  .chip { background: var(--mint-soft); color: var(--teal); font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: 0.04em; padding: 6px 12px; border-radius: 999px; }
+  h1 { margin: 0; font-family: var(--serif); font-weight: 600; font-size: 76px; line-height: 1.05; color: var(--navy); }
+  .subtitle { margin: 0; font-family: var(--serif); font-size: 32px; line-height: 1.25; }
+  .authors { margin: 0; display: flex; flex-wrap: wrap; justify-content: center; column-gap: 40px; row-gap: 6px; font-weight: 500; font-size: 18px; color: var(--teal); }
+  .affils { margin: 0; display: flex; flex-wrap: wrap; justify-content: center; column-gap: 40px; row-gap: 4px; font-size: 15px; color: var(--muted); }
+  .buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; background: var(--navy); color: #fff; text-decoration: none; font-weight: 500; font-size: 15px; padding: 11px 20px; border-radius: 999px; transition: background .15s; }
+  .btn::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--mint); }
+  a.btn:hover { background: #1f3a68; }
+  .btn.soon { opacity: 0.45; cursor: default; }
+
+  /* Figures */
+  figure { margin: 0; }
+  .teaser { padding: 8px 0 72px; }
+  .svg-fig { display: block; width: 100%; height: auto; }
+  .teaser .svg-fig { aspect-ratio: 4096 / 1543; border-radius: 12px; }
+  .edits-fig { max-width: 1025px; }
+  .edits-fig .svg-fig { aspect-ratio: 1025 / 759; }
+  figcaption { margin-top: 16px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  figcaption b { color: var(--ink); font-weight: 600; }
+
+  /* Sections */
+  section.block { padding: 96px 0; }
+  section.sand { background: var(--sand); }
+  .eyebrow { margin: 0 0 14px; font-family: var(--mono); font-weight: 500; font-size: 13px; letter-spacing: 0.1em; color: var(--teal); text-transform: uppercase; }
+  h2 { margin: 0; font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 1.15; color: var(--navy); }
+  h3 { margin: 0; font-family: var(--serif); font-weight: 500; font-size: 26px; color: var(--navy); }
+  .lede { margin: 14px 0 0; max-width: 760px; font-size: 18px; line-height: 1.6; color: var(--muted); }
+  .header { margin-bottom: 40px; }
+  .abstract { max-width: 800px; font-size: 17px; line-height: 1.7; }
+  .abstract p { margin: 0 0 1.7em; }
+  .abstract p:last-child { margin-bottom: 0; }
+
+  /* Distractor cards */
+  .distractors .lede { margin-top: 8px; font-size: 16px; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px; }
+  .card .tag { font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: 0.06em; color: var(--teal); }
+  .card .q { font-family: var(--serif); font-weight: 600; font-size: 22px; line-height: 1.2; color: var(--navy); }
+  .card p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--muted); }
+
+  /* BibTeX */
+  .code { position: relative; background: var(--navy); border-radius: 12px; padding: 24px 28px; }
+  .code pre { margin: 0; overflow-x: auto; font-family: var(--mono); font-size: 14px; line-height: 1.65; color: var(--code-fg); }
+  .copy { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,0.1); color: var(--code-fg); border: 0; border-radius: 8px; padding: 6px 12px; font: 500 13px var(--sans); cursor: pointer; }
+  .copy:hover { background: rgba(255,255,255,0.18); }
+
+  footer { border-top: 1px solid var(--line); }
+  .foot { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; padding: 36px 24px; color: var(--muted); font-size: 14px; }
+  .foot .mono { font-family: var(--mono); font-size: 13px; }
+
+  @media (max-width: 900px) {
+    .nav-inner { padding: 14px 16px; }
+    .nav-links { gap: 16px; }
+    h1 { font-size: 48px; }
+    .subtitle { font-size: 24px; }
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    section.block { padding: 64px 0; }
+    h2 { font-size: 32px; }
+  }
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px; }
+    .nav-links { display: none; }
+    .hero { padding-top: 56px; }
+    h1 { font-size: 40px; }
+    .subtitle { font-size: 21px; }
+    .authors, .affils { column-gap: 20px; }
+    .cards { grid-template-columns: 1fr; }
+    .code { padding: 20px 16px; }
+    .code pre { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top"><img src="assets/logo.svg" alt=""><span>EditJudge-Bench</span></a>
+    <div class="nav-links">
+      <a href="#abstract">Abstract</a>
+      <a href="#benchmark">Benchmark</a>
+      <a href="#distractors">Distractors</a>
+      <a href="#bibtex">BibTeX</a>
+    </div>
+  </div>
+</nav>
+
+<main id="top">
+  <header class="wrap hero">
+    <span class="chip">NeurIPS 2026 · Evaluations &amp; Datasets Track</span>
+    <h1>EditJudge-Bench</h1>
+    <p class="subtitle">Auditing VLM Image-Edit Judges with Synthetic Ground Truth</p>
+    <p class="authors">
+      <span>Jens Parslov<sup>1</sup></span>
+      <span>Marco Schouten<sup>1 2</sup></span>
+      <span>Dim P. Papadopoulos<sup>1 2</sup></span>
+    </p>
+    <p class="affils">
+      <span><sup>1</sup> Technical University of Denmark</span>
+      <span><sup>2</sup> Pioneer Center for AI</span>
+    </p>
+    <div class="buttons">
+      <span class="btn soon" title="Coming soon">Paper</span>
+      <span class="btn soon" title="Coming soon">arXiv</span>
+      <a class="btn" href="https://github.com/JensPars/EditJudge-Bench">Code</a>
+      <span class="btn soon" title="Coming soon">Dataset</span>
+    </div>
+  </header>
+
+  <figure class="wrap teaser">
+    <object class="svg-fig" type="image/svg+xml" data="assets/teaser.svg" aria-label="Teaser: before/after Blender renders with an instruction, judged by a VLM"></object>
+    <figcaption><b>Auditing VLM image-edit judges.</b> We procedurally alter 3D scenes and render controlled before/after image pairs spanning nine edit types, then use these pairs to audit VLM image-edit judges — exposing systematic reliability gaps in current VLM-as-a-judge protocols.</figcaption>
+  </figure>
+
+  <section class="block" id="abstract">
+    <div class="wrap">
+      <div class="header">
+        <p class="eyebrow">Abstract</p>
+        <h2>Can VLM judges actually see the edits they score?</h2>
+      </div>
+      <div class="abstract">
+        <p>Vision–language models (VLMs) are increasingly used as automated judges for image-editing benchmarks, yet their reliability is poorly understood. Auditing these judges is difficult because real edited images lack controlled ground truth and entangle the requested change with model artifacts, unintended side effects, and ambiguous degrees of success. We introduce EditJudge-Bench, a diagnostic benchmark of 1,382 synthetic before/after image pairs rendered in Blender, with edits parameterized across nine categories derived from real user requests and exact ground truth from known 3D scene parameters. Because every edit is generated by a known intervention on a controlled scene, EditJudge-Bench evaluates VLM judges as binary verifiers of whether an instruction was correctly executed, isolating judge perception from editor quality.</p>
+        <p>Across 26 judge configurations, we find substantial reliability gaps: (a) the widely adopted VIEScore template reaches only 69.0% AUROC with GPT-4o; (b) fine-tuned judges score 51.7–66.3%, and spatial edits such as rotation and shape remain near chance; (c) prompt-formatting choices like image–text ordering shift performance by up to 13.9%. Despite using only synthetic data, judge rankings on EditJudge-Bench correlate strongly with two real-image human-preference benchmarks (ρ = 0.93 and ρ = 0.77), indicating that controlled audits surface failure modes relevant to real evaluation.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block sand" id="benchmark">
+    <div class="wrap">
+      <div class="header">
+        <p class="eyebrow">The benchmark</p>
+        <h2>Edits</h2>
+        <p class="lede">Every edit is a deterministic change to a known Blender scene parameter, so its magnitude and direction are known exactly — and everything outside the edit is pixel-identical.</p>
+      </div>
+      <figure class="edits-fig">
+        <object class="svg-fig" type="image/svg+xml" data="assets/edits.svg" aria-label="The nine edit types around a source scene: lighting, remove/add, scale, material, move, camera, rotate, articulate, shape"></object>
+      </figure>
+    </div>
+  </section>
+
+  <section class="block distractors" id="distractors">
+    <div class="wrap">
+      <div class="header">
+        <h3>Counterfactual distractors</h3>
+        <p class="lede">The same image pair is paired with a wrong instruction. A judge is scored by its ability to discern right from wrong.</p>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <span class="tag">DIRECTIONAL</span>
+          <span class="q">“Move the books down”</span>
+          <p>The core parameter is inverted — left ↔ right, larger ↔ smaller, open ↔ closed. Tests perception of direction.</p>
+        </div>
+        <div class="card">
+          <span class="tag">WRONG OBJECT</span>
+          <span class="q">“Move the table right”</span>
+          <p>Same edit, different visible object. Tests object grounding.</p>
+        </div>
+        <div class="card">
+          <span class="tag">CROSS-EDIT-TYPE</span>
+          <span class="q">“Make the sofa bigger”</span>
+          <p>A visually confusable edit type (e.g. zoom vs. scale). Tests what kind of change occurred.</p>
+        </div>
+        <div class="card">
+          <span class="tag">NO EDIT</span>
+          <span class="q">“Don’t change anything”</span>
+          <p>Tests open-ended visual differencing between the two images.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block sand" id="bibtex">
+    <div class="wrap">
+      <div class="header">
+        <p class="eyebrow">Citation</p>
+        <h2>BibTeX</h2>
+      </div>
+      <div class="code">
+        <button class="copy" type="button">Copy</button>
+<pre><code id="bib">@inproceedings{parslov2026editjudge,
+  title     = {EditJudge-Bench: Auditing VLM Image-Edit Judges with Synthetic Ground Truth},
+  author    = {Parslov, Jens and Schouten, Marco and Papadopoulos, Dim P.},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS),
+               Track on Evaluations and Datasets},
+  year      = {2026}
+}</code></pre>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>Technical University of Denmark · Pioneer Center for AI</span>
+    <span class="mono">{jenpa, marscho, dimp}@dtu.dk</span>
+  </div>
+</footer>
+
+<script>
+  document.querySelector(".copy").addEventListener("click", async (e) => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById("bib").textContent);
+      e.target.textContent = "Copied";
+    } catch {
+      e.target.textContent = "Select & copy";
+    }
+    setTimeout(() => (e.target.textContent = "Copy"), 1600);
+  });
+</script>
+</body>
+</html>

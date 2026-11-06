@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use EditJudge-Bench, please cite the paper below."
+title: "EditJudge-Bench"
+type: software
+repository-code: "https://github.com/JensPars/EditJudge-Bench"
+authors:
+  - family-names: Parslov
+    given-names: Jens
+    affiliation: Technical University of Denmark
+  - family-names: Schouten
+    given-names: Marco
+    affiliation: Technical University of Denmark; Pioneer Center for AI
+  - family-names: Papadopoulos
+    given-names: Dim P.
+    affiliation: Technical University of Denmark; Pioneer Center for AI
+preferred-citation:
+  type: conference-paper
+  title: "EditJudge-Bench: Auditing VLM Image-Edit Judges with Synthetic Ground Truth"
+  authors:
+    - family-names: Parslov
+      given-names: Jens
+    - family-names: Schouten
+      given-names: Marco
+    - family-names: Papadopoulos
+      given-names: Dim P.
+  collection-title: "Advances in Neural Information Processing Systems (NeurIPS), Track on Evaluations and Datasets"
+  year: 2026
