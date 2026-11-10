@@ -231,6 +231,8 @@
   /* Sections */
   section.block { padding: 96px 0; }
   section.sand { background: var(--sand); }
+  section.overview { padding: 72px 0 40px; }
+  section.overview .header { margin-bottom: 24px; }
   .eyebrow { margin: 0 0 14px; font-family: var(--mono); font-weight: 500; font-size: 13px; letter-spacing: 0.1em; color: var(--teal); text-transform: uppercase; }
   h2 { margin: 0; font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 1.15; color: var(--navy); }
   h3 { margin: 0; font-family: var(--serif); font-weight: 500; font-size: 26px; color: var(--navy); }
@@ -240,13 +242,24 @@
   .abstract p { margin: 0 0 1.7em; }
   .abstract p:last-child { margin-bottom: 0; }
 
-  /* Distractor cards */
-  .distractors .lede { margin-top: 8px; font-size: 16px; }
-  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-  .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px; }
-  .card .tag { font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: 0.06em; color: var(--teal); }
-  .card .q { font-family: var(--serif); font-weight: 600; font-size: 22px; line-height: 1.2; color: var(--navy); }
-  .card p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--muted); }
+  /* Results table */
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+  table.res { width: 100%; min-width: 920px; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+  table.res th, table.res td { padding: 7px 8px; text-align: center; white-space: nowrap; }
+  table.res thead th { padding: 12px 8px; font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: 0.04em; color: var(--muted); border-bottom: 1px solid var(--line); }
+  table.res thead th:first-child, table.res thead th:nth-child(2), table.res th.m, table.res td.b { text-align: left; }
+  table.res th.m { padding-left: 16px; font-weight: 600; color: var(--navy); }
+  table.res td.b { color: #333b4d; }
+  table.res tr.grp th { padding: 10px 16px; text-align: left; font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); background: var(--sand); border-top: 1px solid var(--line); }
+  table.res tr.r.first td, table.res tr.r.first th { border-top: 1px dashed var(--line); }
+  table.res tr.grp + tr.r.first td, table.res tr.grp + tr.r.first th { border-top: 0; }
+  table.res td.n { background: color-mix(in srgb, var(--mint) calc(var(--v) * 55%), transparent); }
+  table.res td.tot { border-left: 1px solid var(--line); font-weight: 500; }
+  table.res td.tot + td.tot { border-left: 0; }
+  table.res tr.prop td, table.res tr.prop th.m { color: #7b8190; }
+  table.res tr.prop td.n { background: color-mix(in srgb, var(--mint) calc(var(--v) * 28%), transparent); }
+  table.res u { text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .tbl-note { margin: 14px 2px 0; font-size: 13px; line-height: 1.55; color: var(--muted); }
 
   /* BibTeX */
   .code { position: relative; background: var(--navy); border-radius: 12px; padding: 24px 28px; }
@@ -263,7 +276,6 @@
     .nav-links { gap: 16px; }
     h1 { font-size: 48px; }
     .subtitle { font-size: 24px; }
-    .cards { grid-template-columns: repeat(2, 1fr); }
     section.block { padding: 64px 0; }
     h2 { font-size: 32px; }
   }
@@ -288,7 +300,7 @@
     <div class="nav-links">
       <a href="#abstract">Overview</a>
       <a href="#benchmark">Benchmark</a>
-      <a href="#distractors">Distractors</a>
+      <a href="#results">Results</a>
       <a href="#bibtex">BibTeX</a>
     </div>
   </div>
@@ -320,12 +332,7 @@
     <div class="op" id="opening"></div>
   </section>
 
-  <figure class="wrap teaser">
-    <object class="svg-fig" type="image/svg+xml" data="assets/teaser.svg" aria-label="Teaser: a judge rejects a correct instruction (rotate the chair) and accepts a wrong one (move the books down)"></object>
-    <figcaption><b>Auditing VLM image-edit judges.</b> We procedurally alter 3D scenes and render controlled before/after image pairs spanning nine edit types, then use these pairs to audit VLM image-edit judges — exposing systematic reliability gaps in current VLM-as-a-judge protocols.</figcaption>
-  </figure>
-
-  <section class="block" id="abstract">
+  <section class="block overview" id="abstract">
     <div class="wrap">
       <div class="header">
         <p class="eyebrow">Overview</p>
@@ -336,6 +343,11 @@
       </div>
     </div>
   </section>
+
+  <figure class="wrap teaser">
+    <object class="svg-fig" type="image/svg+xml" data="assets/teaser.svg" aria-label="Teaser: a judge rejects a correct instruction (rotate the chair) and accepts a wrong one (move the books down)"></object>
+    <figcaption><b>Auditing VLM image-edit judges.</b> We procedurally alter 3D scenes and render controlled before/after image pairs spanning nine edit types, then use these pairs to audit VLM image-edit judges — exposing systematic reliability gaps in current VLM-as-a-judge protocols.</figcaption>
+  </figure>
 
   <section class="block sand" id="benchmark">
     <div class="wrap">
@@ -352,34 +364,49 @@
     </div>
   </section>
 
-  <section class="block distractors" id="distractors">
+  <section class="block" id="results">
     <div class="wrap">
       <div class="header">
-        <h3>Counterfactual distractors</h3>
-        <p class="lede">The same image pair is paired with a wrong instruction. A judge is scored by its ability to discern right from wrong.</p>
+        <p class="eyebrow">Results</p>
+        <h2>AUROC of VLM judges, by edit type</h2>
       </div>
-      <div class="cards">
-        <div class="card">
-          <span class="tag">DIRECTIONAL</span>
-          <span class="q">“Move the books down”</span>
-          <p>The core parameter is inverted — left ↔ right, larger ↔ smaller, open ↔ closed. Tests perception of direction.</p>
-        </div>
-        <div class="card">
-          <span class="tag">WRONG OBJECT</span>
-          <span class="q">“Move the table right”</span>
-          <p>Same edit, different visible object. Tests object grounding.</p>
-        </div>
-        <div class="card">
-          <span class="tag">CROSS-EDIT-TYPE</span>
-          <span class="q">“Make the sofa bigger”</span>
-          <p>A visually confusable edit type (e.g. zoom vs. scale). Tests what kind of change occurred.</p>
-        </div>
-        <div class="card">
-          <span class="tag">NO EDIT</span>
-          <span class="q">“Don’t change anything”</span>
-          <p>Tests open-ended visual differencing between the two images.</p>
-        </div>
+      <div class="tbl-wrap">
+        <table class="res">
+          <thead><tr><th>Method</th><th>Base model</th><th>Rem</th><th>Mat</th><th>Lgt</th><th>Cam</th><th>Mov</th><th>Scl</th><th>Shp</th><th>Art</th><th>Rot</th><th class="tot">Overall</th><th class="tot">MC Acc.</th></tr></thead>
+          <tbody>
+<tr class="grp gen"><th colspan="12">Generative scoring</th></tr>
+<tr class="r gen first"><th class="m">VIE-score</th><td class="b">LLaVA-OV-7B</td><td class="n" style="--v:0.37">58.8</td><td class="n" style="--v:0.34">57.1</td><td class="n" style="--v:0.31">55.0</td><td class="n" style="--v:0.20">48.1</td><td class="n" style="--v:0.21">48.6</td><td class="n" style="--v:0.22">49.1</td><td class="n" style="--v:0.07">39.4</td><td class="n" style="--v:0.28">53.2</td><td class="n" style="--v:0.35">57.8</td><td class="n tot" style="--v:0.26">51.9</td><td class="n tot" style="--v:0.20">21.9</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Qwen3-VL-4B</td><td class="n" style="--v:0.64">76.8</td><td class="n" style="--v:0.40">61.2</td><td class="n" style="--v:0.43">63.1</td><td class="n" style="--v:0.14">43.8</td><td class="n" style="--v:0.20">47.8</td><td class="n" style="--v:0.16">45.2</td><td class="n" style="--v:0.02">36.3</td><td class="n" style="--v:0.29">54.1</td><td class="n" style="--v:0.00">34.7</td><td class="n tot" style="--v:0.25">51.5</td><td class="n tot" style="--v:0.06">13.8</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Qwen3-VL-8B</td><td class="n" style="--v:0.63">75.9</td><td class="n" style="--v:0.51">68.0</td><td class="n" style="--v:0.48">66.1</td><td class="n" style="--v:0.19">47.5</td><td class="n" style="--v:0.33">56.3</td><td class="n" style="--v:0.29">54.0</td><td class="n" style="--v:0.25">51.0</td><td class="n" style="--v:0.34">57.0</td><td class="n" style="--v:0.00">33.4</td><td class="n tot" style="--v:0.33">56.6</td><td class="n tot" style="--v:0.14">18.3</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Qwen3-VL-8B + Think</td><td class="n" style="--v:0.77">85.0</td><td class="n" style="--v:0.64">76.6</td><td class="n" style="--v:0.59">73.1</td><td class="n" style="--v:0.23">49.7</td><td class="n" style="--v:0.44">63.7</td><td class="n" style="--v:0.23">49.9</td><td class="n" style="--v:0.33">56.2</td><td class="n" style="--v:0.64">76.4</td><td class="n" style="--v:0.18">46.6</td><td class="n tot" style="--v:0.45">64.1</td><td class="n tot" style="--v:0.35">30.8</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Qwen3-VL-32B</td><td class="n" style="--v:0.78">85.5</td><td class="n" style="--v:0.70">80.3</td><td class="n" style="--v:0.61">74.9</td><td class="n" style="--v:0.39">60.4</td><td class="n" style="--v:0.54">69.9</td><td class="n" style="--v:0.32">55.9</td><td class="n" style="--v:0.20">48.2</td><td class="n" style="--v:0.56">71.7</td><td class="n" style="--v:0.09">40.6</td><td class="n tot" style="--v:0.47">65.3</td><td class="n tot" style="--v:0.37">32.3</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Qwen3-VL-32B + Think</td><td class="n" style="--v:0.87">91.4</td><td class="n" style="--v:0.76">84.1</td><td class="n" style="--v:0.73">82.4</td><td class="n" style="--v:0.53">69.3</td><td class="n" style="--v:0.53">69.2</td><td class="n" style="--v:0.35">57.5</td><td class="n" style="--v:0.33">56.4</td><td class="n" style="--v:0.68"><b>79.1</b></td><td class="n" style="--v:0.19">47.3</td><td class="n tot" style="--v:0.55">70.7</td><td class="n tot" style="--v:0.52">41.1</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Gemma-4-31B</td><td class="n" style="--v:0.84">89.9</td><td class="n" style="--v:0.73">82.2</td><td class="n" style="--v:0.74">83.0</td><td class="n" style="--v:0.58">72.4</td><td class="n" style="--v:0.75">83.6</td><td class="n" style="--v:0.48">66.5</td><td class="n" style="--v:0.37">59.1</td><td class="n" style="--v:0.55">70.5</td><td class="n" style="--v:0.41"><u>61.5</u></td><td class="n tot" style="--v:0.60">74.3</td><td class="n tot" style="--v:0.58">45.0</td></tr>
+<tr class="r gen first"><th class="m">Kris</th><td class="b">Qwen3-VL-8B</td><td class="n" style="--v:0.76">84.7</td><td class="n" style="--v:0.67">78.7</td><td class="n" style="--v:0.68">79.4</td><td class="n" style="--v:0.35">57.5</td><td class="n" style="--v:0.53">69.5</td><td class="n" style="--v:0.40">61.2</td><td class="n" style="--v:0.27">52.3</td><td class="n" style="--v:0.54">70.0</td><td class="n" style="--v:0.04">37.8</td><td class="n tot" style="--v:0.47">65.7</td><td class="n tot" style="--v:0.41">34.8</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Gemma-4-31B</td><td class="n" style="--v:0.89">92.8</td><td class="n" style="--v:0.71">81.1</td><td class="n" style="--v:0.68">79.1</td><td class="n" style="--v:0.59">73.4</td><td class="n" style="--v:0.74">83.1</td><td class="n" style="--v:0.50"><u>67.2</u></td><td class="n" style="--v:0.38">59.8</td><td class="n" style="--v:0.46">65.2</td><td class="n" style="--v:0.30">54.6</td><td class="n tot" style="--v:0.58">72.9</td><td class="n tot" style="--v:0.61">46.4</td></tr>
+<tr class="r gen first"><th class="m">ImgEdit</th><td class="b">Qwen3-VL-8B</td><td class="n" style="--v:0.70">80.4</td><td class="n" style="--v:0.59">73.2</td><td class="n" style="--v:0.60">74.1</td><td class="n" style="--v:0.42">62.0</td><td class="n" style="--v:0.46">64.7</td><td class="n" style="--v:0.39">60.4</td><td class="n" style="--v:0.22">49.0</td><td class="n" style="--v:0.46">64.7</td><td class="n" style="--v:0.04">37.9</td><td class="n tot" style="--v:0.43">62.9</td><td class="n tot" style="--v:0.33">29.8</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Gemma-4-31B</td><td class="n" style="--v:0.86">90.7</td><td class="n" style="--v:0.73">82.3</td><td class="n" style="--v:0.79"><u>86.2</u></td><td class="n" style="--v:0.68"><u>79.4</u></td><td class="n" style="--v:0.75"><u>83.8</u></td><td class="n" style="--v:0.45">64.5</td><td class="n" style="--v:0.42"><b>62.5</b></td><td class="n" style="--v:0.49">66.7</td><td class="n" style="--v:0.32">55.5</td><td class="n tot" style="--v:0.61"><u>74.6</u></td><td class="n tot" style="--v:0.61">46.8</td></tr>
+<tr class="grp prop"><th colspan="12">Generative scoring · proprietary, for reference</th></tr>
+<tr class="r prop first"><th class="m">VIE-score</th><td class="b">Gemini-2.5-flash</td><td class="n" style="--v:0.92">94.6</td><td class="n" style="--v:0.79">86.2</td><td class="n" style="--v:0.75">83.8</td><td class="n" style="--v:0.57">71.8</td><td class="n" style="--v:0.64">76.5</td><td class="n" style="--v:0.34">57.1</td><td class="n" style="--v:0.36">58.2</td><td class="n" style="--v:0.58">72.8</td><td class="n" style="--v:0.29">54.0</td><td class="n tot" style="--v:0.58">72.8</td><td class="n tot" style="--v:0.58">44.6</td></tr>
+<tr class="r prop"><th class="m"></th><td class="b">GPT-4.1-mini</td><td class="n" style="--v:0.69">80.1</td><td class="n" style="--v:0.71">81.1</td><td class="n" style="--v:0.69">79.8</td><td class="n" style="--v:0.37">59.2</td><td class="n" style="--v:0.56">71.3</td><td class="n" style="--v:0.35">57.8</td><td class="n" style="--v:0.31">54.9</td><td class="n" style="--v:0.50">67.2</td><td class="n" style="--v:0.31">55.0</td><td class="n tot" style="--v:0.50">67.4</td><td class="n tot" style="--v:0.38">32.7</td></tr>
+<tr class="r prop"><th class="m"></th><td class="b">GPT-4o</td><td class="n" style="--v:0.83">89.2</td><td class="n" style="--v:0.76">84.6</td><td class="n" style="--v:0.66">77.6</td><td class="n" style="--v:0.38">60.0</td><td class="n" style="--v:0.61">74.5</td><td class="n" style="--v:0.33">56.2</td><td class="n" style="--v:0.30">54.5</td><td class="n" style="--v:0.55">70.9</td><td class="n" style="--v:0.29">53.7</td><td class="n tot" style="--v:0.52">69.0</td><td class="n tot" style="--v:0.43">35.8</td></tr>
+<tr class="r prop"><th class="m"></th><td class="b">GPT-5.4</td><td class="n" style="--v:0.93">95.6</td><td class="n" style="--v:0.75">83.6</td><td class="n" style="--v:0.82">88.2</td><td class="n" style="--v:0.56">71.2</td><td class="n" style="--v:0.77">85.1</td><td class="n" style="--v:0.59">73.2</td><td class="n" style="--v:0.48">66.0</td><td class="n" style="--v:0.60">74.1</td><td class="n" style="--v:0.45">64.4</td><td class="n tot" style="--v:0.66">77.9</td><td class="n tot" style="--v:0.66">49.5</td></tr>
+<tr class="r prop"><th class="m"></th><td class="b">GPT-5.6-sol</td><td class="n" style="--v:0.97">97.8</td><td class="n" style="--v:0.82">88.2</td><td class="n" style="--v:0.87">91.4</td><td class="n" style="--v:0.93">95.2</td><td class="n" style="--v:0.92">95.0</td><td class="n" style="--v:0.76">84.4</td><td class="n" style="--v:0.74">83.0</td><td class="n" style="--v:0.71">81.2</td><td class="n" style="--v:0.69">80.1</td><td class="n tot" style="--v:0.82">88.5</td><td class="n tot" style="--v:1.00">71.5</td></tr>
+<tr class="r prop"><th class="m"></th><td class="b">Opus 5</td><td class="n" style="--v:0.98">98.8</td><td class="n" style="--v:0.82">88.3</td><td class="n" style="--v:0.78">86.0</td><td class="n" style="--v:0.89">92.7</td><td class="n" style="--v:0.87">91.8</td><td class="n" style="--v:0.64">76.8</td><td class="n" style="--v:0.59">73.1</td><td class="n" style="--v:0.58">72.9</td><td class="n" style="--v:0.55">70.8</td><td class="n tot" style="--v:0.75">83.5</td><td class="n tot" style="--v:0.86">61.9</td></tr>
+<tr class="grp prob"><th colspan="12">Probabilistic scoring</th></tr>
+<tr class="r prob first"><th class="m">Qwen-Reranker</th><td class="b">Qwen3-VL-Reranker-8B</td><td class="n" style="--v:0.94"><u>96.2</u></td><td class="n" style="--v:0.66">77.8</td><td class="n" style="--v:0.72">81.8</td><td class="n" style="--v:0.39">60.4</td><td class="n" style="--v:0.45">64.3</td><td class="n" style="--v:0.24">50.6</td><td class="n" style="--v:0.18">46.9</td><td class="n" style="--v:0.62">75.2</td><td class="n" style="--v:0.25">51.1</td><td class="n tot" style="--v:0.49">67.1</td><td class="n tot" style="--v:0.56">43.5</td></tr>
+<tr class="r prob first"><th class="m">Log-prob</th><td class="b">Qwen3-VL-4B</td><td class="n" style="--v:0.88">92.3</td><td class="n" style="--v:0.74">82.9</td><td class="n" style="--v:0.67">78.3</td><td class="n" style="--v:0.46">64.9</td><td class="n" style="--v:0.45">64.2</td><td class="n" style="--v:0.20">47.7</td><td class="n" style="--v:0.11">42.4</td><td class="n" style="--v:0.64"><u>76.8</u></td><td class="n" style="--v:0.07">39.4</td><td class="n tot" style="--v:0.47">65.4</td><td class="n tot" style="--v:0.53">41.9</td></tr>
+<tr class="r prob"><th class="m"></th><td class="b">Qwen3-VL-8B</td><td class="n" style="--v:0.94"><u>96.2</u></td><td class="n" style="--v:0.76"><u>84.2</u></td><td class="n" style="--v:0.73">82.7</td><td class="n" style="--v:0.67">78.4</td><td class="n" style="--v:0.70">80.5</td><td class="n" style="--v:0.33">56.5</td><td class="n" style="--v:0.12">42.6</td><td class="n" style="--v:0.59">73.6</td><td class="n" style="--v:0.09">40.6</td><td class="n tot" style="--v:0.55">70.6</td><td class="n tot" style="--v:0.64"><u>48.3</u></td></tr>
+<tr class="r prob"><th class="m"></th><td class="b">Qwen2.5-VL-7B</td><td class="n" style="--v:0.91">93.9</td><td class="n" style="--v:0.72">82.0</td><td class="n" style="--v:0.76">84.3</td><td class="n" style="--v:0.60">73.9</td><td class="n" style="--v:0.60">73.9</td><td class="n" style="--v:0.39">60.1</td><td class="n" style="--v:0.09">40.6</td><td class="n" style="--v:0.63">76.1</td><td class="n" style="--v:0.17">46.1</td><td class="n tot" style="--v:0.54">70.1</td><td class="n tot" style="--v:0.59">45.4</td></tr>
+<tr class="r prob"><th class="m"></th><td class="b">Gemma-4-31B</td><td class="n" style="--v:0.94"><b>96.3</b></td><td class="n" style="--v:0.85"><b>90.1</b></td><td class="n" style="--v:0.84"><b>89.3</b></td><td class="n" style="--v:0.83"><b>88.7</b></td><td class="n" style="--v:0.87"><b>91.6</b></td><td class="n" style="--v:0.58"><b>73.0</b></td><td class="n" style="--v:0.42"><u>62.2</u></td><td class="n" style="--v:0.60">74.1</td><td class="n" style="--v:0.44"><b>63.8</b></td><td class="n tot" style="--v:0.71"><b>81.0</b></td><td class="n tot" style="--v:0.85"><b>60.8</b></td></tr>
+<tr class="grp sup"><th colspan="12">Supervised scoring</th></tr>
+<tr class="r sup first"><th class="m">EditScore</th><td class="b">Qwen3-VL-4B</td><td class="n" style="--v:0.82">88.3</td><td class="n" style="--v:0.71">81.0</td><td class="n" style="--v:0.60">74.1</td><td class="n" style="--v:0.19">47.6</td><td class="n" style="--v:0.46">65.2</td><td class="n" style="--v:0.32">56.0</td><td class="n" style="--v:0.24">50.9</td><td class="n" style="--v:0.38">59.5</td><td class="n" style="--v:0.20">48.0</td><td class="n tot" style="--v:0.44">63.4</td><td class="n tot" style="--v:0.45">37.2</td></tr>
+<tr class="r sup first"><th class="m">ImgEdit-Judge</th><td class="b">Qwen2.5-VL-7B</td><td class="n" style="--v:0.34">57.4</td><td class="n" style="--v:0.38">59.5</td><td class="n" style="--v:0.16">45.1</td><td class="n" style="--v:0.24">50.7</td><td class="n" style="--v:0.36">58.6</td><td class="n" style="--v:0.12">42.9</td><td class="n" style="--v:0.27">52.6</td><td class="n" style="--v:0.39">60.2</td><td class="n" style="--v:0.05">38.1</td><td class="n tot" style="--v:0.26">51.7</td><td class="n tot" style="--v:0.16">19.5</td></tr>
+<tr class="r sup first"><th class="m">EditReward</th><td class="b">Qwen2.5-VL-7B</td><td class="n" style="--v:0.86">91.0</td><td class="n" style="--v:0.60">74.2</td><td class="n" style="--v:0.68">79.1</td><td class="n" style="--v:0.48">66.2</td><td class="n" style="--v:0.54">70.2</td><td class="n" style="--v:0.34">57.1</td><td class="n" style="--v:0.16">45.6</td><td class="n" style="--v:0.42">62.4</td><td class="n" style="--v:0.25">51.1</td><td class="n tot" style="--v:0.48">66.3</td><td class="n tot" style="--v:0.50">40.0</td></tr>
+          </tbody>
+        </table>
       </div>
+      <p class="tbl-note"><b>Bold</b> best, <u>underline</u> second best among open models. Rem removal · Mat material · Lgt light · Cam camera · Mov movement · Scl scale · Shp shape · Art articulation · Rot rotation. MC Acc.: picking the correct instruction among all wrong ones (chance ≈ 21%).</p>
     </div>
   </section>
 
