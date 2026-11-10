@@ -1,0 +1,8 @@
+# Table 1 · VIE-score · Gemini-2.5-flash (images after text)
+paper = 72.8
+backend = "gemini"
+model = "gemini-2.5-flash"
+template = "vie_tie_0shot"
+image_position = "after"
+thinking = true
+max_tokens = 128

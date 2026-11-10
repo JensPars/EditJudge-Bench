@@ -1,0 +1,9 @@
+# Table 1 · ImgEdit · Gemma-4-31B
+# Note: max_tokens and image_position were not logged; values are the runner defaults (outputs are 16 tokens long).
+paper = 74.6
+backend = "vllm"
+model = "nvidia/Gemma-4-31B-IT-NVFP4"
+template = "imgedit"
+image_position = "after"
+max_tokens = 16
+max_model_len = 4096

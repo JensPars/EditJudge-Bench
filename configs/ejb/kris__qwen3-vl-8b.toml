@@ -1,0 +1,8 @@
+# Table 1 · Kris · Qwen3-VL-8B
+paper = 65.7
+backend = "vllm"
+model = "Qwen/Qwen3-VL-8B-Instruct"
+template = "kris_instruction"
+image_position = "after"
+max_tokens = 16
+max_model_len = 4096

@@ -1,0 +1,7 @@
+# Table 3 · GenAI-Bench · Log-prob · Gemma-4-31B
+paper = 83.3
+backend = "vllm"
+model = "nvidia/Gemma-4-31B-IT-NVFP4"
+template = "binary_tagged_images_last"
+logprobs = true
+max_model_len = 1365

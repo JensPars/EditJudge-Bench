@@ -1,0 +1,9 @@
+# Table 1 · ImgEdit · Qwen3-VL-8B
+# Note: max_tokens and image_position were not logged; values are the runner defaults (outputs are 16 tokens long).
+paper = 62.9
+backend = "vllm"
+model = "Qwen/Qwen3-VL-8B-Instruct"
+template = "imgedit"
+image_position = "after"
+max_tokens = 16
+max_model_len = 4096

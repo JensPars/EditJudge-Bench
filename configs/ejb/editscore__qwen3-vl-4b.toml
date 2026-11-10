@@ -1,0 +1,5 @@
+# Table 1 · EditScore · Qwen3-VL-4B
+paper = 63.4
+backend = "editscore"
+model = "EditScore/EditScore-Qwen3-VL-4B-Instruct"
+base_model = "Qwen/Qwen3-VL-4B-Instruct"

@@ -1,0 +1,9 @@
+# Table 1 · ImgEdit-Judge · Qwen2.5-VL-7B
+# Note: Logged as max_tokens 4000 (reconstructed); 512 gives the same greedy outputs (all are under 100 tokens).
+paper = 51.7
+backend = "vllm"
+model = "datasets/sysuyy/ImgEdit/ImgEdit_Judge"
+template = "imgedit_judge"
+image_position = "before"
+max_tokens = 512
+max_model_len = 4096

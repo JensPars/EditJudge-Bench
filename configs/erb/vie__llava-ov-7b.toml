@@ -1,0 +1,8 @@
+# Table 3 · EditReward-Bench · VIE-score · LLaVA-OV-7B
+paper = 48.9
+backend = "vllm"
+model = "llava-hf/llava-onevision-qwen2-7b-ov-hf"
+template = "vie_tie_0shot"
+image_position = "after"
+max_tokens = 256
+max_model_len = 8192

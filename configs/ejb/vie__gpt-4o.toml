@@ -1,0 +1,7 @@
+# Table 1 · VIE-score · GPT-4o
+paper = 69.0
+backend = "openai"
+model = "gpt-4o"
+template = "vie_tie_0shot"
+image_position = "after"
+max_tokens = 1024

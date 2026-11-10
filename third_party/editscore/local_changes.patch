@@ -1,0 +1,86 @@
+diff --git a/editscore/mllm_tools/qwen25vl.py b/editscore/mllm_tools/qwen25vl.py
+index 80859f8..533f445 100644
+--- a/editscore/mllm_tools/qwen25vl.py
++++ b/editscore/mllm_tools/qwen25vl.py
+@@ -39,7 +39,7 @@ class Qwen25VL():
+         lora_path: Optional[str] = None,
+     ) -> None:
+         self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+-            vlm_model, torch_dtype=torch.bfloat16, device_map="auto"
++            vlm_model, torch_dtype=torch.bfloat16, device_map="auto", low_cpu_mem_usage=True
+         )
+         if lora_path:
+             self.model = PeftModel.from_pretrained(self.model, lora_path)
+@@ -94,4 +94,7 @@ class Qwen25VL():
+         )
+ 
+         outputs = [output.strip() for output in outputs]
+-        return outputs[0]
+\ No newline at end of file
++        return outputs[0]
++
++    def batch_inference(self, inputs, seed: Optional[int] = None):
++        return [self.inference(input_item, seed=seed) for input_item in inputs]
+diff --git a/editscore/mllm_tools/qwen25vl_vllm.py b/editscore/mllm_tools/qwen25vl_vllm.py
+index 76d0dfa..d3a0fb4 100644
+--- a/editscore/mllm_tools/qwen25vl_vllm.py
++++ b/editscore/mllm_tools/qwen25vl_vllm.py
+@@ -65,7 +65,7 @@ class Qwen25VL():
+                 print(f"Merging LORA to {vlm_model} and saving to {cache_dir}", flush=True)
+                 start_time = time.time()
+                 model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+-                    vlm_model, torch_dtype=torch.bfloat16, device_map="cpu"
++                    vlm_model, torch_dtype=torch.bfloat16, device_map="auto", low_cpu_mem_usage=True
+                 )
+                 model = PeftModel.from_pretrained(model, lora_path)
+                 model = model.merge_and_unload()
+@@ -135,4 +135,4 @@ class Qwen25VL():
+             instruction = output.outputs[0].text.strip()
+             responses.append(instruction)
+ 
+-        return responses
+\ No newline at end of file
++        return responses
+diff --git a/editscore/mllm_tools/qwen3vl.py b/editscore/mllm_tools/qwen3vl.py
+index 0fb330f..e775e92 100644
+--- a/editscore/mllm_tools/qwen3vl.py
++++ b/editscore/mllm_tools/qwen3vl.py
+@@ -38,7 +38,7 @@ class Qwen3VL():
+         lora_path: Optional[str] = None,
+     ) -> None:
+         self.model = Qwen3VLForConditionalGeneration.from_pretrained(
+-            vlm_model, torch_dtype=torch.bfloat16, device_map="auto"
++            vlm_model, torch_dtype=torch.bfloat16, device_map="auto", low_cpu_mem_usage=True
+         )
+         if lora_path:
+             self.model = PeftModel.from_pretrained(self.model, lora_path)
+@@ -92,4 +92,7 @@ class Qwen3VL():
+         )
+ 
+         outputs = [output.strip() for output in outputs]
+-        return outputs[0]
+\ No newline at end of file
++        return outputs[0]
++
++    def batch_inference(self, inputs, seed: Optional[int] = None):
++        return [self.inference(input_item, seed=seed) for input_item in inputs]
+diff --git a/editscore/mllm_tools/qwen3vl_vllm.py b/editscore/mllm_tools/qwen3vl_vllm.py
+index 2a4cdfa..d789291 100644
+--- a/editscore/mllm_tools/qwen3vl_vllm.py
++++ b/editscore/mllm_tools/qwen3vl_vllm.py
+@@ -65,7 +65,7 @@ class Qwen3VL():
+                 print(f"Merging LORA to {vlm_model} and saving to {cache_dir}", flush=True)
+                 start_time = time.time()
+                 model = Qwen3VLForConditionalGeneration.from_pretrained(
+-                    vlm_model, torch_dtype=torch.bfloat16, device_map="cpu"
++                    vlm_model, torch_dtype=torch.bfloat16, device_map="auto", low_cpu_mem_usage=True
+                 )
+                 model = PeftModel.from_pretrained(model, lora_path)
+                 model = model.merge_and_unload()
+@@ -138,4 +138,4 @@ class Qwen3VL():
+             instruction = output.outputs[0].text.strip()
+             responses.append(instruction)
+ 
+-        return responses
+\ No newline at end of file
++        return responses

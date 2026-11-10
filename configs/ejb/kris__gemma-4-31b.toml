@@ -1,0 +1,8 @@
+# Table 1 · Kris · Gemma-4-31B
+paper = 72.9
+backend = "vllm"
+model = "nvidia/Gemma-4-31B-IT-NVFP4"
+template = "kris_instruction"
+image_position = "after"
+max_tokens = 16
+max_model_len = 4096

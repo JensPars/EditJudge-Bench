@@ -1,0 +1,4 @@
+# Table 3 · EditReward-Bench · EditReward · Qwen2.5-VL-7B
+paper = 60.6
+backend = "editreward"
+model = "TIGER-Lab/EditReward-Qwen2.5-VL-7B"

@@ -1,0 +1,5 @@
+# Table 3 · GenAI-Bench · EditReward · Qwen2.5-VL-7B
+# Note: The paper's GenAI-Bench scores came from an earlier script with the same model and inputs.
+paper = 82.2
+backend = "editreward"
+model = "TIGER-Lab/EditReward-Qwen2.5-VL-7B"

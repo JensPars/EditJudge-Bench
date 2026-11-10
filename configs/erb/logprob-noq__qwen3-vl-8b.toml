@@ -1,0 +1,7 @@
+# Table 3 · EditReward-Bench · Log-prob · Qwen3-VL-8B
+paper = 56.8
+backend = "vllm"
+model = "Qwen/Qwen3-VL-8B-Instruct"
+template = "binary_tagged_images_last"
+logprobs = true
+max_model_len = 1365

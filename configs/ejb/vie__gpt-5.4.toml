@@ -1,0 +1,8 @@
+# Table 1 · VIE-score · GPT-5.4
+paper = 77.9
+backend = "openai"
+model = "gpt-5.4"
+template = "vie_tie_0shot"
+image_position = "after"
+reasoning_effort = "low"
+max_tokens = 8192

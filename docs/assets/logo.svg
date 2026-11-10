@@ -1,0 +1,37 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+<g id="EditJudge-Bench-logo 2" clip-path="url(#clip0_0_1)">
+<path id="Vector" d="M400 0H112C50.1441 0 0 50.1441 0 112V400C0 461.856 50.1441 512 112 512H400C461.856 512 512 461.856 512 400V112C512 50.1441 461.856 0 400 0Z" fill="url(#paint0_linear_0_1)"/>
+<path id="Vector_2" d="M330 330L356 356" stroke="#3CC6A8" stroke-width="30" stroke-linecap="round"/>
+<path id="Vector_3" d="M362 362L430 430" stroke="#3CC6A8" stroke-width="54" stroke-linecap="round"/>
+<path id="Vector_4" d="M226 376C308.843 376 376 308.843 376 226C376 143.157 308.843 76 226 76C143.157 76 76 143.157 76 226C76 308.843 143.157 376 226 376Z" fill="url(#paint1_linear_0_1)" stroke="#3CC6A8" stroke-width="28"/>
+<path id="Vector_5" d="M109.5 183.6C119.461 156.2 138.757 133.186 164 118.6" stroke="white" stroke-opacity="0.35" stroke-width="10" stroke-linecap="round"/>
+<g id="Group">
+<path id="Vector_6" d="M226 148V300" stroke="#F3EFE6" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_7" d="M186 300H266" stroke="#F3EFE6" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_8" d="M146 160L306 136" stroke="#F3EFE6" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_9" d="M146 160L116 232" stroke="#F3EFE6" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_10" d="M146 160L176 232" stroke="#F3EFE6" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_11" d="M306 136L276 208" stroke="#F3EFE6" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_12" d="M306 136L336 208" stroke="#F3EFE6" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g id="Group_2">
+<path id="Vector_13" d="M104 230H188C184 252.667 170 264 146 264C122 264 108 252.667 104 230Z" fill="#F3EFE6"/>
+<path id="Vector_14" d="M264 206H348C344 228.667 330 240 306 240C282 240 268 228.667 264 206Z" fill="#F3EFE6"/>
+<path id="Vector_15" d="M226 159C233.18 159 239 153.18 239 146C239 138.82 233.18 133 226 133C218.82 133 213 138.82 213 146C213 153.18 218.82 159 226 159Z" fill="#F3EFE6"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_1" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+<stop stop-color="#1B3A66"/>
+<stop offset="1" stop-color="#0F2140"/>
+</linearGradient>
+<linearGradient id="paint1_linear_0_1" x1="76" y1="76" x2="376" y2="376" gradientUnits="userSpaceOnUse">
+<stop stop-color="#2B5488"/>
+<stop offset="1" stop-color="#1A3760"/>
+</linearGradient>
+<clipPath id="clip0_0_1">
+<rect width="512" height="512" fill="white"/>
+</clipPath>
+</defs>
+</svg>

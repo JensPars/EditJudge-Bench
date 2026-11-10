@@ -1,0 +1,7 @@
+# Table 5 · VIE-score · GPT-4.1-mini (images before text)
+paper = 53.3
+backend = "openai"
+model = "gpt-4.1-mini"
+template = "vie_tie_0shot"
+image_position = "before"
+max_tokens = 1024

@@ -1,0 +1,11 @@
+# Table 1 · VIE-score · Qwen3-VL-32B + Think
+# Note: image_position was not logged for this run; 'after' is the runner default for this template.
+paper = 70.7
+backend = "vllm"
+model = "Qwen/Qwen3-VL-32B-Thinking"
+template = "vie_tie_0shot"
+image_position = "after"
+max_tokens = 288
+thinking = true
+thinking_budget = 256
+max_model_len = 4096

@@ -1,0 +1,7 @@
+# Table 1 · Log-prob · Gemma-4-31B
+paper = 81.0
+backend = "vllm"
+model = "nvidia/Gemma-4-31B-IT-NVFP4"
+template = "binary_q_images_last"
+logprobs = true
+max_model_len = 4096

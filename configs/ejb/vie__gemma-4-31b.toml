@@ -1,0 +1,8 @@
+# Table 1 · VIE-score · Gemma-4-31B
+paper = 74.3
+backend = "vllm"
+model = "nvidia/Gemma-4-31B-IT-NVFP4"
+template = "vie_tie_0shot"
+image_position = "after"
+max_tokens = 16
+max_model_len = 4096

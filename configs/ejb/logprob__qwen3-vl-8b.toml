@@ -1,0 +1,7 @@
+# Table 1 · Log-prob · Qwen3-VL-8B
+paper = 70.6
+backend = "vllm"
+model = "Qwen/Qwen3-VL-8B-Instruct"
+template = "binary_q_images_last"
+logprobs = true
+max_model_len = 4096

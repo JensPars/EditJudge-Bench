@@ -1,0 +1,7 @@
+# Table 1 · Log-prob · Qwen3-VL-4B
+paper = 65.4
+backend = "vllm"
+model = "Qwen/Qwen3-VL-4B-Instruct"
+template = "binary_q_images_last"
+logprobs = true
+max_model_len = 4096

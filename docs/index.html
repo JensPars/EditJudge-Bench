@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EditJudge-Bench</title>
+<meta name="description" content="EditJudge-Bench: Auditing VLM Image-Edit Judges with Synthetic Ground Truth. NeurIPS 2026, Evaluations & Datasets Track.">
+<meta property="og:title" content="EditJudge-Bench: Auditing VLM Image-Edit Judges with Synthetic Ground Truth">
+<meta property="og:description" content="A diagnostic benchmark of 1,382 synthetic before/after image pairs with exact ground truth for auditing VLM image-edit judges.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #15294b;
+    --ink: #1b1f27;
+    --muted: #5a6170;
+    --teal: #1f6e64;
+    --mint: #3cc6a0;
+    --mint-soft: rgba(60, 198, 160, 0.15);
+    --line: #e2e1da;
+    --sand: #f6f5f0;
+    --code-fg: #e6ecf5;
+    --coral: #e2674a;
+    --serif: "Newsreader", Georgia, serif;
+    --sans: "Inter", system-ui, -apple-system, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+  body { margin: 0; background: #fff; color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  .wrap { max-width: 1088px; margin: 0 auto; padding: 0 24px; }
+
+  /* Nav */
+  .nav { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 18px 48px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .brand img { width: 34px; height: 34px; display: block; }
+  .brand span { font-family: var(--serif); font-weight: 600; font-size: 20px; color: var(--navy); }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { font-weight: 500; font-size: 15px; text-decoration: none; }
+  .nav-links a:hover { color: var(--teal); }
+
+  /* Hero */
+  .hero { text-align: center; padding: 44px 0 28px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .chip { color: var(--teal); font-family: var(--mono); font-weight: 500; font-size: 13px; letter-spacing: 0.04em; }
+  h1 { margin: 0; font-family: var(--serif); font-weight: 600; font-size: 76px; line-height: 1.05; color: var(--navy); }
+  .subtitle { margin: 0; font-family: var(--serif); font-size: 32px; line-height: 1.25; }
+  .authors { margin: 0; display: flex; flex-wrap: wrap; justify-content: center; column-gap: 40px; row-gap: 6px; font-weight: 500; font-size: 18px; color: var(--teal); }
+  .affils { margin: 0; display: flex; flex-wrap: wrap; justify-content: center; column-gap: 40px; row-gap: 4px; font-size: 15px; color: var(--muted); }
+  .buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 32px; }
+  .btn { display: inline-flex; align-items: center; gap: 9px; color: var(--navy); text-decoration: none; font-weight: 500; font-size: 17px; transition: color .15s; }
+  .btn svg, .btn img { width: 22px; height: 22px; flex: none; object-fit: contain; }
+  a.btn:hover { color: var(--teal); }
+  .btn.soon { opacity: 0.4; cursor: default; }
+
+  /* Figures */
+  figure { margin: 0; }
+  .teaser { padding: 8px 0 72px; }
+  .svg-fig { display: block; width: 100%; height: auto; }
+  .teaser .svg-fig { aspect-ratio: 4096 / 1734.52; border-radius: 12px; }
+  .edits-fig { max-width: 1025px; }
+  .edits-fig .svg-fig { aspect-ratio: 1025 / 759; }
+  /* Interactive edits figure (assets/explorer.js) */
+  .ex-stage { position: relative; }
+  .ex-fx { position: absolute; left: 0; top: 0; width: 1025px; height: 759px; transform-origin: 0 0; transform: scale(0); touch-action: manipulation; }
+  .ex-stage.ready .ex-fx.near { cursor: pointer; }
+  .ex-fx > svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+  .ex-veil { fill: #fff; opacity: 0; }
+  .ex-ring { fill: none; stroke: var(--mint); stroke-width: 2.5; opacity: 0; }
+  .ex-ring.ex-sel { stroke-width: 3; }
+  .ex-pulse { fill: none; stroke: var(--mint); stroke-width: 2.5; opacity: 0; }
+  .ex-under.pulse .ex-pulse { animation: ex-pulse 1.3s ease-in-out both; }
+  @keyframes ex-pulse { 0%, 100% { opacity: 0; } 35% { opacity: 0.9; } }
+  .ex-paper { fill: #fff; }
+  .ex-tile { position: absolute; padding: 0; border: 0; background: none; border-radius: 4px; cursor: pointer; }
+  .ex-tile:focus-visible { outline: 3px solid var(--mint); outline-offset: -3px; }
+  .ex-front, .ex-back { position: absolute; left: 0; top: 0; visibility: hidden; pointer-events: none; will-change: transform, opacity; }
+  .ex-front { width: 300px; height: 169px; margin: -84.5px 0 0 -150px; border-radius: 6px; overflow: hidden; background: var(--sand); }
+  .ex-front img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .ex-front .ex-a { opacity: 0; transition: opacity .35s ease; }
+  .ex-front.after .ex-a { opacity: 1; }
+  .ex-chip, .ex-img span { position: absolute; left: 6px; top: 6px; padding: 3px 7px; border-radius: 999px; background: rgba(21, 41, 75, 0.72); color: #fff; font: 500 9px/1.2 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; }
+  .ex-back { width: 296px; height: 171px; margin: -85.5px 0 0 -148px; padding: 5px; border-radius: 9px; background: #fff; box-shadow: 0 6px 18px rgba(21, 41, 75, 0.2); }
+  .ex-back img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 5px; }
+
+  .ex-card { position: absolute; left: 0; top: 0; z-index: 3; width: 1009px; transform-origin: 0 0; visibility: hidden; opacity: 0; color: var(--ink); text-align: left; }
+  .ex-card:focus { outline: none; }
+  .ex-in { padding: 14px; }
+  .ex-imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ex-img { position: relative; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: var(--sand); }
+  .ex-img span { left: 8px; top: 8px; font-size: 10px; }
+  .ex-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .ex-rows { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+  .ex-row { display: grid; grid-template-columns: 16px 1fr 220px 34px; align-items: center; column-gap: 12px; min-height: 22px; font-size: 15px; line-height: 1.3; color: var(--muted); }
+  .ex-row svg { display: block; }
+  .ex-row.pos { color: var(--ink); font-weight: 500; }
+  .ex-bar { height: 6px; border-radius: 3px; background: #edebe4; overflow: hidden; }
+  .ex-bar i { display: block; height: 100%; width: 0; border-radius: 3px; background: #b9c0cc; transition: width .55s cubic-bezier(.2, .8, .2, 1), background-color .3s; }
+  .ex-row.pos .ex-bar i { background: var(--mint); }
+  .ex-row.fool .ex-bar i { background: var(--coral); }
+  .ex-num { font: 500 13px var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+  .ex-row.fool .ex-num { color: var(--coral); }
+  .ex-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 12px; margin-top: 12px; }
+  .ex-dots { display: flex; gap: 6px; }
+  .ex-dots button { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 4px; background: #cfd3da; cursor: pointer; transition: width .25s, background-color .25s; }
+  .ex-dots button[aria-current="true"] { width: 20px; background: var(--navy); }
+  .ex-judges { display: flex; gap: 2px; padding: 2px; border-radius: 999px; background: var(--sand); }
+  .ex-judges button { padding: 4px 10px; white-space: nowrap; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 11px var(--mono); cursor: pointer; transition: background-color .2s, color .2s; }
+  .ex-judges button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+  .ex-close { position: absolute; top: -9px; right: -9px; z-index: 1; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; background: var(--navy); color: #fff; cursor: pointer; box-shadow: 0 2px 8px rgba(21, 41, 75, 0.3); }
+  .ex-card.sheet { position: fixed; left: 50%; right: auto; top: auto; bottom: 0; z-index: 20; width: min(680px, 100vw); max-height: 88vh; overflow-y: auto; opacity: 1; visibility: hidden; transform: translate(-50%, 105%); border-radius: 18px 18px 0 0; background: #fff; box-shadow: 0 -10px 40px rgba(21, 41, 75, 0.25); padding-bottom: env(safe-area-inset-bottom); transition: transform .38s cubic-bezier(.2, .8, .2, 1), visibility 0s .38s; }
+  .ex-card.sheet.show { visibility: visible; transform: translate(-50%, 0); transition: transform .38s cubic-bezier(.2, .8, .2, 1); }
+  .ex-card.sheet .ex-in { padding: 16px; }
+  .ex-card.sheet .ex-close { top: 10px; right: 10px; }
+  .ex-card.sheet .ex-imgs { margin-top: 26px; }
+  .ex-card.sheet .ex-row { grid-template-columns: 16px 1fr 90px 30px; font-size: 14px; }
+  @media (max-width: 560px) {
+    .ex-card.sheet .ex-imgs { grid-template-columns: 1fr; }
+    .ex-card.sheet .ex-row { grid-template-columns: 16px 1fr 56px 28px; }
+  }
+  .ex-card.sheet .ex-judges button { padding: 5px 8px; }
+  /* Opening block (assets/opening.js) */
+  .opening { padding: 0 0 64px; }
+  .op { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+  .op-card { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 28px; padding: 20px; border-radius: 20px; background: var(--sand); }
+  .op-frame { position: relative; align-self: start; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #e9e7df; cursor: pointer; user-select: none; -webkit-user-select: none; }
+  .op-pair { position: absolute; inset: 0; transition: opacity .18s ease; }
+  .op-frame.swap .op-pair { opacity: 0; }
+  .op-pair img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .op-pair img:not([src]) { visibility: hidden; }
+  .op-pair .op-a { opacity: 0; transition: opacity .4s ease; }
+  .op-frame.after .op-a { opacity: 1; }
+  .op-seg { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(21, 41, 75, 0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  .op-seg button { padding: 5px 12px; border: 0; border-radius: 999px; background: none; color: rgba(255, 255, 255, 0.72); font: 500 11px/1.2 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background-color .25s, color .25s; }
+  .op-seg button[aria-pressed="true"] { background: #fff; color: var(--navy); }
+
+  .op-panel { display: flex; flex-direction: column; min-width: 0; padding: 4px 4px 0 0; }
+  .op-panel:focus { outline: none; }
+  .op-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 34px; margin-bottom: 12px; }
+  .op-q { margin: 0; font: 500 27px/1.15 var(--serif); color: var(--navy); }
+  .op-q b { font-weight: 600; color: var(--coral); }
+  .op-q.good b { color: var(--teal); }
+  .op-dots { display: flex; flex: none; gap: 6px; }
+  .op-dots i { width: 8px; height: 8px; border-radius: 50%; background: #d5d3ca; }
+  .op-dots i.now { background: var(--navy); }
+  .op-dots i.ok { background: var(--mint); }
+  .op-dots i.no { background: var(--coral); }
+
+  .op-opts { display: flex; flex: 1 1 auto; flex-direction: column; gap: 6px; }
+  .op-opt { position: relative; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; column-gap: 10px; flex: 1 1 auto; width: 100%; min-height: 40px; max-height: 58px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); font: 400 14.5px/1.3 var(--sans); text-align: left; cursor: pointer; overflow: hidden; transition: border-color .15s, box-shadow .15s, transform .15s; animation: op-in .4s cubic-bezier(.2, .8, .2, 1) backwards; animation-delay: calc(var(--n) * 45ms + 120ms); }
+  @keyframes op-in { from { opacity: 0; transform: translateY(6px); } }
+  .op-opt:enabled:hover, .op-opt:focus-visible { border-color: var(--navy); box-shadow: 0 2px 10px rgba(21, 41, 75, 0.1); transform: translateY(-1px); outline: none; }
+  .op-opt:disabled { cursor: default; color: var(--ink); }
+  .op-opt > :not(.op-fill) { position: relative; }
+  .op-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: rgba(21, 41, 75, 0.07); transition: width .6s cubic-bezier(.2, .8, .2, 1), background-color .3s; }
+  .op-mark { display: grid; place-items: center; width: 18px; height: 18px; border: 1.5px solid #c9ccd3; border-radius: 50%; color: #fff; transition: background-color .2s, border-color .2s; }
+  .op-opt.true { border-color: var(--mint); font-weight: 500; }
+  .op-opt.true .op-mark { border-color: var(--mint); background: var(--mint); }
+  .op-opt.miss { border-color: var(--coral); }
+  .op-opt.miss .op-mark { border-color: var(--coral); background: var(--coral); }
+  .op-num { min-width: 28px; text-align: right; font: 500 13px var(--mono); font-variant-numeric: tabular-nums; color: var(--muted); opacity: 0; transition: opacity .3s .15s, color .3s; }
+  .op-opts.shown .op-num { opacity: 1; }
+  .op-opt.top .op-fill { background: rgba(226, 103, 74, 0.2); }
+  .op-opt.top .op-num { color: var(--coral); font-weight: 600; }
+  .op-opt.top.true .op-fill { background: rgba(60, 198, 160, 0.24); }
+  .op-opt.top.true .op-num { color: var(--teal); }
+
+  .op-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 14px; visibility: hidden; opacity: 0; transition: opacity .3s .2s; }
+  .op-foot.show { visibility: visible; opacity: 1; }
+  .op-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .op-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); font: 500 12px/1.2 var(--sans); white-space: nowrap; }
+  .op-chip svg { color: var(--teal); }
+  .op-chip.no svg { color: var(--coral); }
+  button.op-chip { cursor: pointer; transition: background-color .2s, color .2s, border-color .2s; }
+  button.op-chip:hover { border-color: var(--navy); }
+  button.op-chip[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+  button.op-chip[aria-pressed="true"] svg { color: var(--mint); }
+  button.op-chip[aria-pressed="true"].no svg { color: #ff9d86; }
+  .op-next { display: inline-flex; flex: none; align-items: center; gap: 6px; padding: 9px 16px; border: 0; border-radius: 999px; background: var(--navy); color: #fff; font: 500 14px var(--sans); text-decoration: none; white-space: nowrap; cursor: pointer; transition: background-color .15s; }
+  .op-next:hover { background: #1f3a68; }
+  .op-again { padding: 0; border: 0; background: none; color: var(--teal); font: 500 14px var(--sans); text-decoration: none; cursor: pointer; }
+  .op-again:hover { color: var(--navy); }
+
+  .op-board { width: 100%; margin-top: 2px; border-collapse: collapse; }
+  .op-board thead th { padding: 0 3px 10px; }
+  .op-board thead img { display: block; width: 68px; aspect-ratio: 16 / 9; margin: 0 auto; border-radius: 5px; object-fit: cover; }
+  .op-board tbody th, .op-board tbody td { padding: 10px 0; border-top: 1px solid var(--line); }
+  .op-board tbody th { text-align: left; font: 500 14.5px var(--sans); white-space: nowrap; }
+  .op-board tbody td { text-align: center; }
+  .op-res { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--mint); color: #fff; vertical-align: middle; }
+  .op-res.no { background: var(--coral); }
+  .op-board .op-tally { width: 52px; text-align: right; font: 500 21px var(--serif); font-variant-numeric: tabular-nums; color: var(--navy); }
+
+  .op-strip { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 10px 28px; padding: 18px 20px 0; opacity: 0; transform: translateY(6px); transition: opacity .4s, transform .4s; }
+  .op-strip.show { opacity: 1; transform: none; }
+  .op-cap { font: 500 11px/1.45 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .op-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+  .op-stat { display: grid; grid-template-columns: 1fr auto; align-items: baseline; row-gap: 6px; font-size: 14px; }
+  .op-stat .l { font-weight: 500; }
+  .op-stat .v { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+  .op-stat .t { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: #edebe4; overflow: hidden; }
+  .op-stat .t i { display: block; width: 0; height: 100%; border-radius: 3px; background: var(--navy); transition: width .9s cubic-bezier(.2, .8, .2, 1) .15s; }
+  .op-strip.show .t i { width: var(--v); }
+  .op-stat.people .t i { background: var(--mint); }
+  .op-stat.chance { color: var(--muted); }
+  .op-stat.chance .t i { background: #b9c0cc; }
+  .op-live { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+
+  @media (max-width: 960px) {
+    .op { padding: 0 12px; }
+    .op-card { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 12px; border-radius: 16px; }
+    .op-panel { padding: 0 2px 2px; }
+    .op-q { font-size: 24px; }
+    .op-opts { flex: none; }
+    .op-opt { flex: none; min-height: 44px; max-height: none; }
+    .op-strip { grid-template-columns: 1fr; padding: 16px 14px 0; }
+    .op-stats { grid-template-columns: repeat(2, 1fr); gap: 14px 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .op-opt { animation: none; }
+    .op-pair, .op-pair .op-a, .op-fill, .op-foot, .op-strip, .op-stat .t i { transition: none; }
+  }
+  figcaption { margin-top: 16px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  figcaption b { color: var(--ink); font-weight: 600; }
+
+  /* Sections */
+  section.block { padding: 96px 0; }
+  section.sand { background: var(--sand); }
+  section.overview { padding: 72px 0 40px; }
+  section.overview .header { margin-bottom: 24px; }
+  .eyebrow { margin: 0 0 14px; font-family: var(--mono); font-weight: 500; font-size: 13px; letter-spacing: 0.1em; color: var(--teal); text-transform: uppercase; }
+  h2 { margin: 0; font-family: var(--serif); font-weight: 500; font-size: 40px; line-height: 1.15; color: var(--navy); }
+  h3 { margin: 0; font-family: var(--serif); font-weight: 500; font-size: 26px; color: var(--navy); }
+  .lede { margin: 14px 0 0; max-width: 760px; font-size: 18px; line-height: 1.6; color: var(--muted); }
+  .header { margin-bottom: 40px; }
+  .abstract { max-width: 800px; font-size: 17px; line-height: 1.7; }
+  .abstract p { margin: 0 0 1.7em; }
+  .abstract p:last-child { margin-bottom: 0; }
+
+  /* Results table */
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+  table.res { width: 100%; min-width: 920px; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+  table.res th, table.res td { padding: 7px 8px; text-align: center; white-space: nowrap; }
+  table.res thead th { padding: 12px 8px; font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: 0.04em; color: var(--muted); border-bottom: 1px solid var(--line); }
+  table.res thead th:first-child, table.res thead th:nth-child(2), table.res th.m, table.res td.b { text-align: left; }
+  table.res th.m { padding-left: 16px; font-weight: 600; color: var(--navy); }
+  table.res td.b { color: #333b4d; }
+  table.res tr.grp th { padding: 10px 16px; text-align: left; font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); background: var(--sand); border-top: 1px solid var(--line); }
+  table.res tr.r.first td, table.res tr.r.first th { border-top: 1px dashed var(--line); }
+  table.res tr.grp + tr.r.first td, table.res tr.grp + tr.r.first th { border-top: 0; }
+  table.res td.n { background: color-mix(in srgb, var(--mint) calc(var(--v) * 55%), transparent); }
+  table.res td.tot { border-left: 1px solid var(--line); font-weight: 500; }
+  table.res td.tot + td.tot { border-left: 0; }
+  table.res tr.prop td, table.res tr.prop th.m { color: #7b8190; }
+  table.res tr.prop td.n { background: color-mix(in srgb, var(--mint) calc(var(--v) * 28%), transparent); }
+  table.res u { text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .tbl-note { margin: 14px 2px 0; font-size: 13px; line-height: 1.55; color: var(--muted); }
+
+  /* BibTeX */
+  .code { position: relative; background: var(--navy); border-radius: 12px; padding: 24px 28px; }
+  .code pre { margin: 0; overflow-x: auto; font-family: var(--mono); font-size: 14px; line-height: 1.65; color: var(--code-fg); }
+  .copy { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,0.1); color: var(--code-fg); border: 0; border-radius: 8px; padding: 6px 12px; font: 500 13px var(--sans); cursor: pointer; }
+  .copy:hover { background: rgba(255,255,255,0.18); }
+
+  footer { border-top: 1px solid var(--line); }
+  .foot { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; padding: 36px 24px; color: var(--muted); font-size: 14px; }
+  .foot .mono { font-family: var(--mono); font-size: 13px; }
+
+  @media (max-width: 900px) {
+    .nav-inner { padding: 14px 16px; }
+    .nav-links { gap: 16px; }
+    h1 { font-size: 48px; }
+    .subtitle { font-size: 24px; }
+    section.block { padding: 64px 0; }
+    h2 { font-size: 32px; }
+  }
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px; }
+    .nav-links { display: none; }
+    .hero { padding-top: 36px; }
+    h1 { font-size: 40px; }
+    .subtitle { font-size: 21px; }
+    .authors, .affils { column-gap: 20px; }
+    .cards { grid-template-columns: 1fr; }
+    .code { padding: 20px 16px; }
+    .code pre { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top"><img src="assets/logo.svg" alt=""><span>EditJudge-Bench</span></a>
+    <div class="nav-links">
+      <a href="#abstract">Overview</a>
+      <a href="#benchmark">Benchmark</a>
+      <a href="#results">Results</a>
+      <a href="#bibtex">BibTeX</a>
+    </div>
+  </div>
+</nav>
+
+<main id="top">
+  <header class="wrap hero">
+    <span class="chip">NeurIPS 2026 · Evaluations &amp; Datasets Track</span>
+    <h1>EditJudge-Bench</h1>
+    <p class="subtitle">Auditing VLM Image-Edit Judges with Synthetic Ground Truth</p>
+    <p class="authors">
+      <span>Jens Parslov<sup>1</sup></span>
+      <span>Marco Schouten<sup>1 2</sup></span>
+      <span>Dim P. Papadopoulos<sup>1 2</sup></span>
+    </p>
+    <p class="affils">
+      <span><sup>1</sup> Technical University of Denmark</span>
+      <span><sup>2</sup> Pioneer Center for AI</span>
+    </p>
+    <div class="buttons">
+      <span class="btn soon" title="Coming soon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Paper</span>
+      <span class="btn soon" title="Coming soon"><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#B31B1B" d="M3.8423 0a1.0037 1.0037 0 0 0-.922.6078c-.1536.3687-.0438.6275.2938 1.1113l6.9185 8.3597-1.0223 1.1058a1.0393 1.0393 0 0 0 .003 1.4229l1.2292 1.3135-5.4391 6.4444c-.2803.299-.4538.823-.2971 1.1986a1.0253 1.0253 0 0 0 .9585.635.9133.9133 0 0 0 .6891-.3405l5.783-6.126 7.4902 8.0051a.8527.8527 0 0 0 .6835.2597.9575.9575 0 0 0 .8777-.6138c.1577-.377-.017-.7502-.306-1.1407l-7.0518-8.3418 1.0632-1.13a.9626.9626 0 0 0 .0089-1.3165L4.6336.4639s-.3733-.4535-.768-.463zm0 .272h.0166c.2179.0052.4874.2715.5644.3639l.005.006.0052.0055 10.169 10.9905a.6915.6915 0 0 1-.0072.945l-1.0666 1.133-1.4982-1.7724-8.5994-10.39c-.3286-.472-.352-.6183-.2592-.841a.7307.7307 0 0 1 .6704-.4401Zm14.341 1.5701a.877.877 0 0 0-.6554.2418l-5.6962 6.1584 1.6944 1.8319 5.3089-6.5138c.3251-.4335.479-.6603.3247-1.0292a1.1205 1.1205 0 0 0-.9763-.689zm-7.6557 12.2823 1.3186 1.4135-5.7864 6.1295a.6494.6494 0 0 1-.4959.26.7516.7516 0 0 1-.706-.4669c-.1119-.2682.0359-.6864.2442-.9083l.0051-.0055.0047-.0055z"/></svg>arXiv</span>
+      <a class="btn" href="https://github.com/JensPars/EditJudge-Bench"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>Code</a>
+      <a class="btn" href="https://huggingface.co/datasets/JensParslov/EditJudge-Bench"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 95 88" fill="none"> <path fill="#FFD21E" d="M47.21 76.5a34.75 34.75 0 1 0 0-69.5 34.75 34.75 0 0 0 0 69.5Z" /> <path fill="#FF9D0B" d="M81.96 41.75a34.75 34.75 0 1 0-69.5 0 34.75 34.75 0 0 0 69.5 0Zm-73.5 0a38.75 38.75 0 1 1 77.5 0 38.75 38.75 0 0 1-77.5 0Z" /> <path fill="#3A3B45" d="M58.5 32.3c1.28.44 1.78 3.06 3.07 2.38a5 5 0 1 0-6.76-2.07c.61 1.15 2.55-.72 3.7-.32ZM34.95 32.3c-1.28.44-1.79 3.06-3.07 2.38a5 5 0 1 1 6.76-2.07c-.61 1.15-2.56-.72-3.7-.32Z" /> <path fill="#FF323D" d="M46.96 56.29c9.83 0 13-8.76 13-13.26 0-2.34-1.57-1.6-4.09-.36-2.33 1.15-5.46 2.74-8.9 2.74-7.19 0-13-6.88-13-2.38s3.16 13.26 13 13.26Z" /> <path fill="#3A3B45" fill-rule="evenodd" d="M39.43 54a8.7 8.7 0 0 1 5.3-4.49c.4-.12.81.57 1.24 1.28.4.68.82 1.37 1.24 1.37.45 0 .9-.68 1.33-1.35.45-.7.89-1.38 1.32-1.25a8.61 8.61 0 0 1 5 4.17c3.73-2.94 5.1-7.74 5.1-10.7 0-2.34-1.57-1.6-4.09-.36l-.14.07c-2.31 1.15-5.39 2.67-8.77 2.67s-6.45-1.52-8.77-2.67c-2.6-1.29-4.23-2.1-4.23.29 0 3.05 1.46 8.06 5.47 10.97Z" clip-rule="evenodd" /> <path fill="#FF9D0B" d="M70.71 37a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5ZM24.21 37a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5ZM17.52 48c-1.62 0-3.06.66-4.07 1.87a5.97 5.97 0 0 0-1.33 3.76 7.1 7.1 0 0 0-1.94-.3c-1.55 0-2.95.59-3.94 1.66a5.8 5.8 0 0 0-.8 7 5.3 5.3 0 0 0-1.79 2.82c-.24.9-.48 2.8.8 4.74a5.22 5.22 0 0 0-.37 5.02c1.02 2.32 3.57 4.14 8.52 6.1 3.07 1.22 5.89 2 5.91 2.01a44.33 44.33 0 0 0 10.93 1.6c5.86 0 10.05-1.8 12.46-5.34 3.88-5.69 3.33-10.9-1.7-15.92-2.77-2.78-4.62-6.87-5-7.77-.78-2.66-2.84-5.62-6.25-5.62a5.7 5.7 0 0 0-4.6 2.46c-1-1.26-1.98-2.25-2.86-2.82A7.4 7.4 0 0 0 17.52 48Zm0 4c.51 0 1.14.22 1.82.65 2.14 1.36 6.25 8.43 7.76 11.18.5.92 1.37 1.31 2.14 1.31 1.55 0 2.75-1.53.15-3.48-3.92-2.93-2.55-7.72-.68-8.01.08-.02.17-.02.24-.02 1.7 0 2.45 2.93 2.45 2.93s2.2 5.52 5.98 9.3c3.77 3.77 3.97 6.8 1.22 10.83-1.88 2.75-5.47 3.58-9.16 3.58-3.81 0-7.73-.9-9.92-1.46-.11-.03-13.45-3.8-11.76-7 .28-.54.75-.76 1.34-.76 2.38 0 6.7 3.54 8.57 3.54.41 0 .7-.17.83-.6.79-2.85-12.06-4.05-10.98-8.17.2-.73.71-1.02 1.44-1.02 3.14 0 10.2 5.53 11.68 5.53.11 0 .2-.03.24-.1.74-1.2.33-2.04-4.9-5.2-5.21-3.16-8.88-5.06-6.8-7.33.24-.26.58-.38 1-.38 3.17 0 10.66 6.82 10.66 6.82s2.02 2.1 3.25 2.1c.28 0 .52-.1.68-.38.86-1.46-8.06-8.22-8.56-11.01-.34-1.9.24-2.85 1.31-2.85Z" /> <path fill="#FFD21E" d="M38.6 76.69c2.75-4.04 2.55-7.07-1.22-10.84-3.78-3.77-5.98-9.3-5.98-9.3s-.82-3.2-2.69-2.9c-1.87.3-3.24 5.08.68 8.01 3.91 2.93-.78 4.92-2.29 2.17-1.5-2.75-5.62-9.82-7.76-11.18-2.13-1.35-3.63-.6-3.13 2.2.5 2.79 9.43 9.55 8.56 11-.87 1.47-3.93-1.71-3.93-1.71s-9.57-8.71-11.66-6.44c-2.08 2.27 1.59 4.17 6.8 7.33 5.23 3.16 5.64 4 4.9 5.2-.75 1.2-12.28-8.53-13.36-4.4-1.08 4.11 11.77 5.3 10.98 8.15-.8 2.85-9.06-5.38-10.74-2.18-1.7 3.21 11.65 6.98 11.76 7.01 4.3 1.12 15.25 3.49 19.08-2.12Z" /> <path fill="#FF9D0B" d="M77.4 48c1.62 0 3.07.66 4.07 1.87a5.97 5.97 0 0 1 1.33 3.76 7.1 7.1 0 0 1 1.95-.3c1.55 0 2.95.59 3.94 1.66a5.8 5.8 0 0 1 .8 7 5.3 5.3 0 0 1 1.78 2.82c.24.9.48 2.8-.8 4.74a5.22 5.22 0 0 1 .37 5.02c-1.02 2.32-3.57 4.14-8.51 6.1-3.08 1.22-5.9 2-5.92 2.01a44.33 44.33 0 0 1-10.93 1.6c-5.86 0-10.05-1.8-12.46-5.34-3.88-5.69-3.33-10.9 1.7-15.92 2.78-2.78 4.63-6.87 5.01-7.77.78-2.66 2.83-5.62 6.24-5.62a5.7 5.7 0 0 1 4.6 2.46c1-1.26 1.98-2.25 2.87-2.82A7.4 7.4 0 0 1 77.4 48Zm0 4c-.51 0-1.13.22-1.82.65-2.13 1.36-6.25 8.43-7.76 11.18a2.43 2.43 0 0 1-2.14 1.31c-1.54 0-2.75-1.53-.14-3.48 3.91-2.93 2.54-7.72.67-8.01a1.54 1.54 0 0 0-.24-.02c-1.7 0-2.45 2.93-2.45 2.93s-2.2 5.52-5.97 9.3c-3.78 3.77-3.98 6.8-1.22 10.83 1.87 2.75 5.47 3.58 9.15 3.58 3.82 0 7.73-.9 9.93-1.46.1-.03 13.45-3.8 11.76-7-.29-.54-.75-.76-1.34-.76-2.38 0-6.71 3.54-8.57 3.54-.42 0-.71-.17-.83-.6-.8-2.85 12.05-4.05 10.97-8.17-.19-.73-.7-1.02-1.44-1.02-3.14 0-10.2 5.53-11.68 5.53-.1 0-.19-.03-.23-.1-.74-1.2-.34-2.04 4.88-5.2 5.23-3.16 8.9-5.06 6.8-7.33-.23-.26-.57-.38-.98-.38-3.18 0-10.67 6.82-10.67 6.82s-2.02 2.1-3.24 2.1a.74.74 0 0 1-.68-.38c-.87-1.46 8.05-8.22 8.55-11.01.34-1.9-.24-2.85-1.31-2.85Z" /> <path fill="#FFD21E" d="M56.33 76.69c-2.75-4.04-2.56-7.07 1.22-10.84 3.77-3.77 5.97-9.3 5.97-9.3s.82-3.2 2.7-2.9c1.86.3 3.23 5.08-.68 8.01-3.92 2.93.78 4.92 2.28 2.17 1.51-2.75 5.63-9.82 7.76-11.18 2.13-1.35 3.64-.6 3.13 2.2-.5 2.79-9.42 9.55-8.55 11 .86 1.47 3.92-1.71 3.92-1.71s9.58-8.71 11.66-6.44c2.08 2.27-1.58 4.17-6.8 7.33-5.23 3.16-5.63 4-4.9 5.2.75 1.2 12.28-8.53 13.36-4.4 1.08 4.11-11.76 5.3-10.97 8.15.8 2.85 9.05-5.38 10.74-2.18 1.69 3.21-11.65 6.98-11.76 7.01-4.31 1.12-15.26 3.49-19.08-2.12Z" /> </svg>Dataset</a>
+    </div>
+  </header>
+
+  <section class="opening" id="try" aria-label="See a judge at work">
+    <div class="op" id="opening"></div>
+  </section>
+
+  <section class="block overview" id="abstract">
+    <div class="wrap">
+      <div class="header">
+        <p class="eyebrow">Overview</p>
+        <h2>Can VLM judges actually see the edits they score?</h2>
+      </div>
+      <div class="abstract">
+        <p>EditJudge-Bench is 1,382 before/after pairs rendered in Blender, with exact ground truth across nine edit types. It tests whether VLM judges can verify that an edit was done correctly. Across 26 judge setups, even strong judges fall short (VIEScore + GPT-4o: 69.0% AUROC), spatial edits stay near chance, and rankings still track real-image human preference (ρ up to 0.93).</p>
+      </div>
+    </div>
+  </section>
+
+  <figure class="wrap teaser">
+    <object class="svg-fig" type="image/svg+xml" data="assets/teaser.svg" aria-label="Teaser: a judge rejects a correct instruction (rotate the chair) and accepts a wrong one (move the books down)"></object>
+    <figcaption><b>Auditing VLM image-edit judges.</b> We procedurally alter 3D scenes and render controlled before/after image pairs spanning nine edit types, then use these pairs to audit VLM image-edit judges — exposing systematic reliability gaps in current VLM-as-a-judge protocols.</figcaption>
+  </figure>
+
+  <section class="block sand" id="benchmark">
+    <div class="wrap">
+      <div class="header">
+        <p class="eyebrow">The benchmark</p>
+        <h2>Edits</h2>
+        <p class="lede">Every edit is a deterministic change to a known Blender scene parameter, so its magnitude and direction are known exactly — and everything outside the edit is pixel-identical.</p>
+      </div>
+      <figure class="edits-fig">
+        <div class="ex-stage">
+          <object class="svg-fig" type="image/svg+xml" data="assets/edits.svg" aria-label="The nine edit types around a source scene: lighting, remove/add, scale, material, move, camera, rotate, articulate, shape"></object>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="block" id="results">
+    <div class="wrap">
+      <div class="header">
+        <p class="eyebrow">Results</p>
+        <h2>AUROC of VLM judges, by edit type</h2>
+      </div>
+      <div class="tbl-wrap">
+        <table class="res">
+          <thead><tr><th>Method</th><th>Base model</th><th>Rem</th><th>Mat</th><th>Lgt</th><th>Cam</th><th>Mov</th><th>Scl</th><th>Shp</th><th>Art</th><th>Rot</th><th class="tot">Overall</th><th class="tot">MC Acc.</th></tr></thead>
+          <tbody>
+<tr class="grp gen"><th colspan="12">Generative scoring</th></tr>
+<tr class="r gen first"><th class="m">VIE-score</th><td class="b">LLaVA-OV-7B</td><td class="n" style="--v:0.37">58.8</td><td class="n" style="--v:0.34">57.1</td><td class="n" style="--v:0.31">55.0</td><td class="n" style="--v:0.20">48.1</td><td class="n" style="--v:0.21">48.6</td><td class="n" style="--v:0.22">49.1</td><td class="n" style="--v:0.07">39.4</td><td class="n" style="--v:0.28">53.2</td><td class="n" style="--v:0.35">57.8</td><td class="n tot" style="--v:0.26">51.9</td><td class="n tot" style="--v:0.20">21.9</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Qwen3-VL-4B</td><td class="n" style="--v:0.64">76.8</td><td class="n" style="--v:0.40">61.2</td><td class="n" style="--v:0.43">63.1</td><td class="n" style="--v:0.14">43.8</td><td class="n" style="--v:0.20">47.8</td><td class="n" style="--v:0.16">45.2</td><td class="n" style="--v:0.02">36.3</td><td class="n" style="--v:0.29">54.1</td><td class="n" style="--v:0.00">34.7</td><td class="n tot" style="--v:0.25">51.5</td><td class="n tot" style="--v:0.06">13.8</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Qwen3-VL-8B</td><td class="n" style="--v:0.63">75.9</td><td class="n" style="--v:0.51">68.0</td><td class="n" style="--v:0.48">66.1</td><td class="n" style="--v:0.19">47.5</td><td class="n" style="--v:0.33">56.3</td><td class="n" style="--v:0.29">54.0</td><td class="n" style="--v:0.25">51.0</td><td class="n" style="--v:0.34">57.0</td><td class="n" style="--v:0.00">33.4</td><td class="n tot" style="--v:0.33">56.6</td><td class="n tot" style="--v:0.14">18.3</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Qwen3-VL-8B + Think</td><td class="n" style="--v:0.77">85.0</td><td class="n" style="--v:0.64">76.6</td><td class="n" style="--v:0.59">73.1</td><td class="n" style="--v:0.23">49.7</td><td class="n" style="--v:0.44">63.7</td><td class="n" style="--v:0.23">49.9</td><td class="n" style="--v:0.33">56.2</td><td class="n" style="--v:0.64">76.4</td><td class="n" style="--v:0.18">46.6</td><td class="n tot" style="--v:0.45">64.1</td><td class="n tot" style="--v:0.35">30.8</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Qwen3-VL-32B</td><td class="n" style="--v:0.78">85.5</td><td class="n" style="--v:0.70">80.3</td><td class="n" style="--v:0.61">74.9</td><td class="n" style="--v:0.39">60.4</td><td class="n" style="--v:0.54">69.9</td><td class="n" style="--v:0.32">55.9</td><td class="n" style="--v:0.20">48.2</td><td class="n" style="--v:0.56">71.7</td><td class="n" style="--v:0.09">40.6</td><td class="n tot" style="--v:0.47">65.3</td><td class="n tot" style="--v:0.37">32.3</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Qwen3-VL-32B + Think</td><td class="n" style="--v:0.87">91.4</td><td class="n" style="--v:0.76">84.1</td><td class="n" style="--v:0.73">82.4</td><td class="n" style="--v:0.53">69.3</td><td class="n" style="--v:0.53">69.2</td><td class="n" style="--v:0.35">57.5</td><td class="n" style="--v:0.33">56.4</td><td class="n" style="--v:0.68"><b>79.1</b></td><td class="n" style="--v:0.19">47.3</td><td class="n tot" style="--v:0.55">70.7</td><td class="n tot" style="--v:0.52">41.1</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Gemma-4-31B</td><td class="n" style="--v:0.84">89.9</td><td class="n" style="--v:0.73">82.2</td><td class="n" style="--v:0.74">83.0</td><td class="n" style="--v:0.58">72.4</td><td class="n" style="--v:0.75">83.6</td><td class="n" style="--v:0.48">66.5</td><td class="n" style="--v:0.37">59.1</td><td class="n" style="--v:0.55">70.5</td><td class="n" style="--v:0.41"><u>61.5</u></td><td class="n tot" style="--v:0.60">74.3</td><td class="n tot" style="--v:0.58">45.0</td></tr>
+<tr class="r gen first"><th class="m">Kris</th><td class="b">Qwen3-VL-8B</td><td class="n" style="--v:0.76">84.7</td><td class="n" style="--v:0.67">78.7</td><td class="n" style="--v:0.68">79.4</td><td class="n" style="--v:0.35">57.5</td><td class="n" style="--v:0.53">69.5</td><td class="n" style="--v:0.40">61.2</td><td class="n" style="--v:0.27">52.3</td><td class="n" style="--v:0.54">70.0</td><td class="n" style="--v:0.04">37.8</td><td class="n tot" style="--v:0.47">65.7</td><td class="n tot" style="--v:0.41">34.8</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Gemma-4-31B</td><td class="n" style="--v:0.89">92.8</td><td class="n" style="--v:0.71">81.1</td><td class="n" style="--v:0.68">79.1</td><td class="n" style="--v:0.59">73.4</td><td class="n" style="--v:0.74">83.1</td><td class="n" style="--v:0.50"><u>67.2</u></td><td class="n" style="--v:0.38">59.8</td><td class="n" style="--v:0.46">65.2</td><td class="n" style="--v:0.30">54.6</td><td class="n tot" style="--v:0.58">72.9</td><td class="n tot" style="--v:0.61">46.4</td></tr>
+<tr class="r gen first"><th class="m">ImgEdit</th><td class="b">Qwen3-VL-8B</td><td class="n" style="--v:0.70">80.4</td><td class="n" style="--v:0.59">73.2</td><td class="n" style="--v:0.60">74.1</td><td class="n" style="--v:0.42">62.0</td><td class="n" style="--v:0.46">64.7</td><td class="n" style="--v:0.39">60.4</td><td class="n" style="--v:0.22">49.0</td><td class="n" style="--v:0.46">64.7</td><td class="n" style="--v:0.04">37.9</td><td class="n tot" style="--v:0.43">62.9</td><td class="n tot" style="--v:0.33">29.8</td></tr>
+<tr class="r gen"><th class="m"></th><td class="b">Gemma-4-31B</td><td class="n" style="--v:0.86">90.7</td><td class="n" style="--v:0.73">82.3</td><td class="n" style="--v:0.79"><u>86.2</u></td><td class="n" style="--v:0.68"><u>79.4</u></td><td class="n" style="--v:0.75"><u>83.8</u></td><td class="n" style="--v:0.45">64.5</td><td class="n" style="--v:0.42"><b>62.5</b></td><td class="n" style="--v:0.49">66.7</td><td class="n" style="--v:0.32">55.5</td><td class="n tot" style="--v:0.61"><u>74.6</u></td><td class="n tot" style="--v:0.61">46.8</td></tr>
+<tr class="grp prop"><th colspan="12">Generative scoring · proprietary, for reference</th></tr>
+<tr class="r prop first"><th class="m">VIE-score</th><td class="b">Gemini-2.5-flash</td><td class="n" style="--v:0.92">94.6</td><td class="n" style="--v:0.79">86.2</td><td class="n" style="--v:0.75">83.8</td><td class="n" style="--v:0.57">71.8</td><td class="n" style="--v:0.64">76.5</td><td class="n" style="--v:0.34">57.1</td><td class="n" style="--v:0.36">58.2</td><td class="n" style="--v:0.58">72.8</td><td class="n" style="--v:0.29">54.0</td><td class="n tot" style="--v:0.58">72.8</td><td class="n tot" style="--v:0.58">44.6</td></tr>
+<tr class="r prop"><th class="m"></th><td class="b">GPT-4.1-mini</td><td class="n" style="--v:0.69">80.1</td><td class="n" style="--v:0.71">81.1</td><td class="n" style="--v:0.69">79.8</td><td class="n" style="--v:0.37">59.2</td><td class="n" style="--v:0.56">71.3</td><td class="n" style="--v:0.35">57.8</td><td class="n" style="--v:0.31">54.9</td><td class="n" style="--v:0.50">67.2</td><td class="n" style="--v:0.31">55.0</td><td class="n tot" style="--v:0.50">67.4</td><td class="n tot" style="--v:0.38">32.7</td></tr>
+<tr class="r prop"><th class="m"></th><td class="b">GPT-4o</td><td class="n" style="--v:0.83">89.2</td><td class="n" style="--v:0.76">84.6</td><td class="n" style="--v:0.66">77.6</td><td class="n" style="--v:0.38">60.0</td><td class="n" style="--v:0.61">74.5</td><td class="n" style="--v:0.33">56.2</td><td class="n" style="--v:0.30">54.5</td><td class="n" style="--v:0.55">70.9</td><td class="n" style="--v:0.29">53.7</td><td class="n tot" style="--v:0.52">69.0</td><td class="n tot" style="--v:0.43">35.8</td></tr>
+<tr class="r prop"><th class="m"></th><td class="b">GPT-5.4</td><td class="n" style="--v:0.93">95.6</td><td class="n" style="--v:0.75">83.6</td><td class="n" style="--v:0.82">88.2</td><td class="n" style="--v:0.56">71.2</td><td class="n" style="--v:0.77">85.1</td><td class="n" style="--v:0.59">73.2</td><td class="n" style="--v:0.48">66.0</td><td class="n" style="--v:0.60">74.1</td><td class="n" style="--v:0.45">64.4</td><td class="n tot" style="--v:0.66">77.9</td><td class="n tot" style="--v:0.66">49.5</td></tr>
+<tr class="r prop"><th class="m"></th><td class="b">GPT-5.6-sol</td><td class="n" style="--v:0.97">97.8</td><td class="n" style="--v:0.82">88.2</td><td class="n" style="--v:0.87">91.4</td><td class="n" style="--v:0.93">95.2</td><td class="n" style="--v:0.92">95.0</td><td class="n" style="--v:0.76">84.4</td><td class="n" style="--v:0.74">83.0</td><td class="n" style="--v:0.71">81.2</td><td class="n" style="--v:0.69">80.1</td><td class="n tot" style="--v:0.82">88.5</td><td class="n tot" style="--v:1.00">71.5</td></tr>
+<tr class="r prop"><th class="m"></th><td class="b">Opus 5</td><td class="n" style="--v:0.98">98.8</td><td class="n" style="--v:0.82">88.3</td><td class="n" style="--v:0.78">86.0</td><td class="n" style="--v:0.89">92.7</td><td class="n" style="--v:0.87">91.8</td><td class="n" style="--v:0.64">76.8</td><td class="n" style="--v:0.59">73.1</td><td class="n" style="--v:0.58">72.9</td><td class="n" style="--v:0.55">70.8</td><td class="n tot" style="--v:0.75">83.5</td><td class="n tot" style="--v:0.86">61.9</td></tr>
+<tr class="grp prob"><th colspan="12">Probabilistic scoring</th></tr>
+<tr class="r prob first"><th class="m">Qwen-Reranker</th><td class="b">Qwen3-VL-Reranker-8B</td><td class="n" style="--v:0.94"><u>96.2</u></td><td class="n" style="--v:0.66">77.8</td><td class="n" style="--v:0.72">81.8</td><td class="n" style="--v:0.39">60.4</td><td class="n" style="--v:0.45">64.3</td><td class="n" style="--v:0.24">50.6</td><td class="n" style="--v:0.18">46.9</td><td class="n" style="--v:0.62">75.2</td><td class="n" style="--v:0.25">51.1</td><td class="n tot" style="--v:0.49">67.1</td><td class="n tot" style="--v:0.56">43.5</td></tr>
+<tr class="r prob first"><th class="m">Log-prob</th><td class="b">Qwen3-VL-4B</td><td class="n" style="--v:0.88">92.3</td><td class="n" style="--v:0.74">82.9</td><td class="n" style="--v:0.67">78.3</td><td class="n" style="--v:0.46">64.9</td><td class="n" style="--v:0.45">64.2</td><td class="n" style="--v:0.20">47.7</td><td class="n" style="--v:0.11">42.4</td><td class="n" style="--v:0.64"><u>76.8</u></td><td class="n" style="--v:0.07">39.4</td><td class="n tot" style="--v:0.47">65.4</td><td class="n tot" style="--v:0.53">41.9</td></tr>
+<tr class="r prob"><th class="m"></th><td class="b">Qwen3-VL-8B</td><td class="n" style="--v:0.94"><u>96.2</u></td><td class="n" style="--v:0.76"><u>84.2</u></td><td class="n" style="--v:0.73">82.7</td><td class="n" style="--v:0.67">78.4</td><td class="n" style="--v:0.70">80.5</td><td class="n" style="--v:0.33">56.5</td><td class="n" style="--v:0.12">42.6</td><td class="n" style="--v:0.59">73.6</td><td class="n" style="--v:0.09">40.6</td><td class="n tot" style="--v:0.55">70.6</td><td class="n tot" style="--v:0.64"><u>48.3</u></td></tr>
+<tr class="r prob"><th class="m"></th><td class="b">Qwen2.5-VL-7B</td><td class="n" style="--v:0.91">93.9</td><td class="n" style="--v:0.72">82.0</td><td class="n" style="--v:0.76">84.3</td><td class="n" style="--v:0.60">73.9</td><td class="n" style="--v:0.60">73.9</td><td class="n" style="--v:0.39">60.1</td><td class="n" style="--v:0.09">40.6</td><td class="n" style="--v:0.63">76.1</td><td class="n" style="--v:0.17">46.1</td><td class="n tot" style="--v:0.54">70.1</td><td class="n tot" style="--v:0.59">45.4</td></tr>
+<tr class="r prob"><th class="m"></th><td class="b">Gemma-4-31B</td><td class="n" style="--v:0.94"><b>96.3</b></td><td class="n" style="--v:0.85"><b>90.1</b></td><td class="n" style="--v:0.84"><b>89.3</b></td><td class="n" style="--v:0.83"><b>88.7</b></td><td class="n" style="--v:0.87"><b>91.6</b></td><td class="n" style="--v:0.58"><b>73.0</b></td><td class="n" style="--v:0.42"><u>62.2</u></td><td class="n" style="--v:0.60">74.1</td><td class="n" style="--v:0.44"><b>63.8</b></td><td class="n tot" style="--v:0.71"><b>81.0</b></td><td class="n tot" style="--v:0.85"><b>60.8</b></td></tr>
+<tr class="grp sup"><th colspan="12">Supervised scoring</th></tr>
+<tr class="r sup first"><th class="m">EditScore</th><td class="b">Qwen3-VL-4B</td><td class="n" style="--v:0.82">88.3</td><td class="n" style="--v:0.71">81.0</td><td class="n" style="--v:0.60">74.1</td><td class="n" style="--v:0.19">47.6</td><td class="n" style="--v:0.46">65.2</td><td class="n" style="--v:0.32">56.0</td><td class="n" style="--v:0.24">50.9</td><td class="n" style="--v:0.38">59.5</td><td class="n" style="--v:0.20">48.0</td><td class="n tot" style="--v:0.44">63.4</td><td class="n tot" style="--v:0.45">37.2</td></tr>
+<tr class="r sup first"><th class="m">ImgEdit-Judge</th><td class="b">Qwen2.5-VL-7B</td><td class="n" style="--v:0.34">57.4</td><td class="n" style="--v:0.38">59.5</td><td class="n" style="--v:0.16">45.1</td><td class="n" style="--v:0.24">50.7</td><td class="n" style="--v:0.36">58.6</td><td class="n" style="--v:0.12">42.9</td><td class="n" style="--v:0.27">52.6</td><td class="n" style="--v:0.39">60.2</td><td class="n" style="--v:0.05">38.1</td><td class="n tot" style="--v:0.26">51.7</td><td class="n tot" style="--v:0.16">19.5</td></tr>
+<tr class="r sup first"><th class="m">EditReward</th><td class="b">Qwen2.5-VL-7B</td><td class="n" style="--v:0.86">91.0</td><td class="n" style="--v:0.60">74.2</td><td class="n" style="--v:0.68">79.1</td><td class="n" style="--v:0.48">66.2</td><td class="n" style="--v:0.54">70.2</td><td class="n" style="--v:0.34">57.1</td><td class="n" style="--v:0.16">45.6</td><td class="n" style="--v:0.42">62.4</td><td class="n" style="--v:0.25">51.1</td><td class="n tot" style="--v:0.48">66.3</td><td class="n tot" style="--v:0.50">40.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tbl-note"><b>Bold</b> best, <u>underline</u> second best among open models. Rem removal · Mat material · Lgt light · Cam camera · Mov movement · Scl scale · Shp shape · Art articulation · Rot rotation. MC Acc.: picking the correct instruction among all wrong ones (chance ≈ 21%).</p>
+    </div>
+  </section>
+
+  <section class="block sand" id="bibtex">
+    <div class="wrap">
+      <div class="header">
+        <p class="eyebrow">Citation</p>
+        <h2>BibTeX</h2>
+      </div>
+      <div class="code">
+        <button class="copy" type="button">Copy</button>
+<pre><code id="bib">@inproceedings{parslov2026editjudge,
+  title     = {EditJudge-Bench: Auditing VLM Image-Edit Judges with Synthetic Ground Truth},
+  author    = {Parslov, Jens and Schouten, Marco and Papadopoulos, Dim P.},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS),
+               Track on Evaluations and Datasets},
+  year      = {2026}
+}</code></pre>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>Technical University of Denmark · Pioneer Center for AI</span>
+    <span class="mono">{jenpa, marscho, dimp}@dtu.dk</span>
+  </div>
+</footer>
+
+<script>
+  document.querySelector(".copy").addEventListener("click", async (e) => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById("bib").textContent);
+      e.target.textContent = "Copied";
+    } catch {
+      e.target.textContent = "Select & copy";
+    }
+    setTimeout(() => (e.target.textContent = "Copy"), 1600);
+  });
+</script>
+<script src="assets/opening.js" defer></script>
+<script src="assets/explorer.js" defer></script>
+</body>
+</html>

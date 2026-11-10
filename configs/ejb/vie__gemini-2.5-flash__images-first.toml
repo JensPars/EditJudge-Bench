@@ -1,0 +1,9 @@
+# Table 5 · VIE-score · Gemini-2.5-flash (images before text)
+# Note: Thinking was not logged for this run; set as in the images-after run so only the image position differs.
+paper = 59.1
+backend = "gemini"
+model = "gemini-2.5-flash"
+template = "vie_tie_0shot"
+image_position = "before"
+thinking = true
+max_tokens = 128

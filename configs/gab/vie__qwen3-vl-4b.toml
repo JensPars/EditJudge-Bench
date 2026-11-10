@@ -1,0 +1,8 @@
+# Table 3 · GenAI-Bench · VIE-score · Qwen3-VL-4B
+paper = 78.1
+backend = "vllm"
+model = "Qwen/Qwen3-VL-4B-Instruct"
+template = "vie_tie_0shot"
+image_position = "after"
+max_tokens = 16
+max_model_len = 1365
