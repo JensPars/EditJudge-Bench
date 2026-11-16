@@ -3,7 +3,7 @@
 **Auditing VLM Image-Edit Judges with Synthetic Ground Truth**
 Jens Parslov, Marco Schouten, Dim P. Papadopoulos · NeurIPS 2026, Track on Evaluations and Datasets
 
-[Project page](https://jenspars.github.io/EditJudge-Bench/) · [Paper](https://openreview.net/forum?id=eynW4BxY28) · [Dataset](https://huggingface.co/datasets/JensParslov/EditJudge-Bench)
+[Project page](https://jenspars.github.io/EditJudge-Bench/) · [Paper](https://openreview.net/forum?id=eynW4BxY28) · [arXiv](https://arxiv.org/abs/2611.12524) · [Dataset](https://huggingface.co/datasets/JensParslov/EditJudge-Bench)
 
 ![EditJudge-Bench overview: a 3D scene is edited and rendered as a before/after pair, and a VLM judge scores it against an instruction](docs/assets/teaser.png)
 
